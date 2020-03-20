@@ -94,6 +94,8 @@ namespace.createTag("stone_variants","blocks",["minecraft:granite","minecraft:an
 ```
 ### Added loot functions
 ### Changed it so datapack.addNamespace, and other methods like it create a dereferenced copy of the passed child object and return it
+### Added a github repository
+[Repository](https://github.com/Brent-Trenholme/minecraft-datapacks)
 
 # Features
 
