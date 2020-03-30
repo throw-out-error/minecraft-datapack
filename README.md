@@ -1,5 +1,5 @@
 # What is it?
-minecraft-datapack is a module for making minecraft datapcks with node to cut down on repitition
+minecraft-datapack is a module for making minecraft datapcks with node to cut down on repitition  
 [![npm version](https://badge.fury.io/js/%40throw-out-error%2Fminecraft-datapack.svg)](https://badge.fury.io/js/%40throw-out-error%2Fminecraft-datapack)
 
 # Examples
