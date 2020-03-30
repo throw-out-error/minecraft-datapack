@@ -2,7 +2,15 @@ const fs=require("fs");
 const getDirname=require("path").dirname;
 
 const mkdirIfNotExist=path=>{if(!fs.existsSync(path))fs.mkdirSync(path,{recursive:true});};
-const dataCategories=["functions","tags/blocks","tags/items","tags/functions","recipes","loot_tables"];
+const dataCategories=[
+    "functions",
+    "tags/blocks",
+    "tags/items",
+    "tags/functions",
+    "recipes",
+    "loot_tables",
+    "predicates"
+];
 const hasIllegalChars=s=>s!=s.replace(/[^0-9a-z_\-\.]/g,"");
 const hasIllegalCharsSlash=s=>s!=s.replace(/[^0-9a-z_\-\.\/]/g,"");
 const itemArrayFromString=s=>s.split("||").map(s=>s[0]=="#"?{tag:s.slice(1)}:{item:s});
@@ -519,11 +527,11 @@ class LootPool {
     }
     /**
      * Adds a condition to the loot pool
-     * @param {LootCondition} condition the condition to be added to the pool
-     * @returns {LootCondition} returns a reference to the added condition
+     * @param {Condition} condition the condition to be added to the pool
+     * @returns {Condition} returns a reference to the added condition
      */
     addCondition(condition){
-        let copy=LootCondition.copy(condition)
+        let copy=Condition.copy(condition)
         this.conditions.push(copy);
         return copy;
     }
@@ -559,11 +567,11 @@ class LootEntry {
     }
     /**
      * Adds a condition to the loot pool
-     * @param {LootCondition} condition the condition to be added to the pool
-     * @returns {LootCondition} returns a reference to the added condition
+     * @param {Condition} condition the condition to be added to the pool
+     * @returns {Condition} returns a reference to the added condition
      */
     addCondition(condition){
-        let copy=LootCondition.copy(condition)
+        let copy=Condition.copy(condition)
         this.conditions.push(copy);
         return copy;
     }
@@ -666,11 +674,11 @@ class LootFunction {
     }
     /**
      * Adds a condition to the loot pool
-     * @param {LootCondition} condition the condition to be added to the pool
-     * @returns {LootCondition} returns a reference to the added condition
+     * @param {Condition} condition the condition to be added to the pool
+     * @returns {Condition} returns a reference to the added condition
      */
     addCondition(condition){
-        let copy=LootCondition.copy(condition)
+        let copy=Condition.copy(condition)
         this.conditions.push(copy);
         return copy;
     }
@@ -686,7 +694,7 @@ class LootFunction {
     }
 }
 
-class LootCondition {
+class Condition {
     /**
      * @param {object} options the configuration of the loot condition
      */
@@ -726,5 +734,8 @@ module.exports={
         LootTableEntry,
         LootEntry,
         LootFunction
+    },
+    predicate:{
+        Condition
     }
 };

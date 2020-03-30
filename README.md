@@ -81,24 +81,11 @@ datapack.compile()
 //if you run /loot give @s dirt:dirt ingame you will get 1-64 dirt
 ```
 # Change log
-## 1.5 the loot update!
-### Added loot tables
-### Added loot pools
-### Added item loot entries
-### Added empty loot entries
-### Added loot table loot entries
-### Changed datapack.createNamespace, and other methods like it to return the created child object
-### Changed the Tag constructor to accept an array of values instead of having to be added in later
-```js
-let namespace=datapack.createNamespace("namespace");
-namespace.createTag("stone_variants","blocks",["minecraft:granite","minecraft:andesite","minecraft:diorite"]);
-```
-### Added loot functions
-### Changed it so datapack.addNamespace, and other methods like it create a dereferenced copy of the passed child object and return it
-### Added a github repository
-[Repository](https://github.com/Brent-Trenholme/minecraft-datapacks)
-### Added loot conditions
-### that is it for the loot update :D
+## 1.6 the predicate update!
+### The class LootCondition has been renamed to Condition and is exported under the name predicate.Condition
+This is due to conditions being used in predicates as well as loot tables, the decision to move the  
+condition class to the predicate namespace was due to predicates being able to be used as more complex  
+conditions.
 
 # Features
 
