@@ -1,6 +1,8 @@
 const getDirname=require("path").dirname;
 const mkdirIfNotExist=path=>{if(!fs.existsSync(path))fs.mkdirSync(path,{recursive:true});};
 const jsonBeautify=require("./jsonBeautify");
+const hasIllegalCharsSlash=s=>s!=s.replace(/[^0-9a-z_\-\.\/]/g,"");
+
 
 const Condition=require("./predicate").Condition;
 
@@ -10,6 +12,7 @@ class LootTable {
      * @param {string} path The path of the loot table file relative to namespace/loot_tables (excluding the file extension)
      */
     constructor(path){
+        if(hasIllegalCharsSlash(path))throw new Error("The names of loot tables can only contain the following characters 0-9, a-z, _, -, ., /");
         /** @type {string} The path of the loot table file relative to namespace/loot_tables */
         this.path=path;
         /** @type {LootPool[]} The loot tables list of pools */

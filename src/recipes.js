@@ -1,6 +1,9 @@
 const getDirname=require("path").dirname;
 const mkdirIfNotExist=path=>{if(!fs.existsSync(path))fs.mkdirSync(path,{recursive:true});};
 const jsonBeautify=require("./jsonBeautify");
+const hasIllegalCharsSlash=s=>s!=s.replace(/[^0-9a-z_\-\.\/]/g,"");
+const itemArrayFromString=s=>s.split("||").map(s=>s[0]=="#"?{tag:s.slice(1)}:{item:s});
+
 
 class Recipe {
     /**

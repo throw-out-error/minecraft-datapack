@@ -11,8 +11,6 @@ const dataCategories=[
     "predicates"
 ];
 const hasIllegalChars=s=>s!=s.replace(/[^0-9a-z_\-\.]/g,"");
-const hasIllegalCharsSlash=s=>s!=s.replace(/[^0-9a-z_\-\.\/]/g,"");
-const itemArrayFromString=s=>s.split("||").map(s=>s[0]=="#"?{tag:s.slice(1)}:{item:s});
 
 const recipes=require("./recipes");
 const Recipe=recipes.Recipe;
