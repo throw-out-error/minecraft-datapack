@@ -1,5 +1,6 @@
 const getDirname=require("path").dirname;
 const mkdirIfNotExist=path=>{if(!fs.existsSync(path))fs.mkdirSync(path,{recursive:true});};
+const jsonBeautify=require("./jsonBeautify");
 
 class Recipe {
     /**
