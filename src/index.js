@@ -43,7 +43,9 @@ const jsonBeautify=object=>{
 }
 
 const recipes=require("./recipes");
+const Recipe=recipes.Recipe;
 const loot=require("./loot");
+const LootTable=loot.LootTable;
 const predicate=require("./predicate");
 const Tag=require("./tag");
 
