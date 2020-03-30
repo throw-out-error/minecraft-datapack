@@ -96,6 +96,8 @@ namespace.createTag("stone_variants","blocks",["minecraft:granite","minecraft:an
 ### Changed it so datapack.addNamespace, and other methods like it create a dereferenced copy of the passed child object and return it
 ### Added a github repository
 [Repository](https://github.com/Brent-Trenholme/minecraft-datapacks)
+### Added loot conditions
+### that is it for the loot update :D
 
 # Features
 
@@ -124,7 +126,7 @@ Datapack
 3) The ability to add recipes to your datapacks  
 
 ## In progress:
-The ability to add loot table files  
+
 
 ## Planned to be implemented:
 The ability to add predicate, advancement, and function files.  

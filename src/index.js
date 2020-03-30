@@ -5,7 +5,7 @@ const mkdirIfNotExist=path=>{if(!fs.existsSync(path))fs.mkdirSync(path,{recursiv
 const dataCategories=["functions","tags/blocks","tags/items","tags/functions","recipes","loot_tables"];
 const hasIllegalChars=s=>s!=s.replace(/[^0-9a-z_\-\.]/g,"");
 const hasIllegalCharsSlash=s=>s!=s.replace(/[^0-9a-z_\-\.\/]/g,"");
-const itemArrayFromString=(s)=>s.split("||").map(s=>s[0]=="#"?{tag:s.slice(1)}:{item:s});
+const itemArrayFromString=s=>s.split("||").map(s=>s[0]=="#"?{tag:s.slice(1)}:{item:s});
 const jsonBeautify=object=>{
     let json=JSON.stringify(object).split('');
     let indent=0;
@@ -492,9 +492,20 @@ class LootPool {
         this.bonusRolls=options.bonusRolls;
         /** @type {LootEntry[]} an array of the pools entries*/
         this.entries=[];
+        /** @type {LootCondition[]} an array of the pools conditions */
+        this.conditions=[];
     }
+    /**
+     * Generates the data associated with the pool
+     * @returns {object|array} the generated json
+     */
     compile(){
-        return {rolls:this.rolls,bonus_rools:this.bonusRolls,entries:this.entries.map(entry=>entry.compile())};
+        return {
+            rolls:this.rolls,
+            bonus_rools:this.bonusRolls,
+            entries:this.entries.map(entry=>entry.compile()),
+            conditions:this.conditions.map(condition=>condition.compile())
+        };
     }
     /**
      * Adds an entry to the loot pool
@@ -504,6 +515,16 @@ class LootPool {
     addEntry(entry){
         let copy=LootEntry.copy(entry)
         this.entries.push(copy);
+        return copy;
+    }
+    /**
+     * Adds a condition to the loot pool
+     * @param {LootCondition} condition the condition to be added to the pool
+     * @returns {LootCondition} returns a reference to the added condition
+     */
+    addCondition(condition){
+        let copy=LootCondition.copy(condition)
+        this.conditions.push(copy);
         return copy;
     }
     /**
@@ -526,11 +547,25 @@ class LootEntry {
     constructor(type){
         /** @type {('minecraft:item'|'minecraft:loot_table'|'minecraft:empty')} the type of loot entry*/
         this.type=type;
-        /** @type {object} the output object of the entry */
-        this.output={type:"minecraft:item"};
+        /** @type {LootCondition[]} the conditions of the entry */
+        this.conditions=[];
     }
+    /**
+     * Generates the data associated with the entry
+     * @returns {object|array} the generated json
+     */
     compile(){
-        return this.output;
+        return {type:this.type,conditions:this.conditions.map(condition=>condition.compile())};
+    }
+    /**
+     * Adds a condition to the loot pool
+     * @param {LootCondition} condition the condition to be added to the pool
+     * @returns {LootCondition} returns a reference to the added condition
+     */
+    addCondition(condition){
+        let copy=LootCondition.copy(condition)
+        this.conditions.push(copy);
+        return copy;
     }
     /**
      * Creates a copy of the loot entry
@@ -575,8 +610,12 @@ class ItemEntry extends LootEntry {
         this.functions.push(funct);
         return funct;
     }
+    /**
+     * Generates the data associated with the item entry
+     * @returns {object|array} the generated json
+     */
     compile(){
-        return {...this.output,...{functions:this.functions.map(f=>f.options)}};
+        return {...this.output,...{functions:this.functions.map(f=>f.compile())}};
     }
 }
 
@@ -615,6 +654,25 @@ class LootFunction {
     constructor(options){
         /** @type {object} the configuration of the function */
         this.options=options;
+        /** @type {LootCondition[]} */
+        this.conditions=[];
+    }
+    /**
+     * Generates the data associated with the function
+     * @returns {object|array} the generated json
+     */
+    compile(){
+        return {...this.options,...{condition:this.conditions.map(condition=>condition.compile())}}
+    }
+    /**
+     * Adds a condition to the loot pool
+     * @param {LootCondition} condition the condition to be added to the pool
+     * @returns {LootCondition} returns a reference to the added condition
+     */
+    addCondition(condition){
+        let copy=LootCondition.copy(condition)
+        this.conditions.push(copy);
+        return copy;
     }
     /**
      * Creates a copy of the loot function
@@ -622,7 +680,28 @@ class LootFunction {
      * @returns {LootFunction} a copy of the loot function 
      */
     static copy(lootFunction) {
-        let copy=new lootFunction(lootFunction.options);
+        let copy=new lootFunction({});
+        for(key in {...lootFunction})copy[key]=lootFunction[key];
+        return copy;
+    }
+}
+
+class LootCondition {
+    /**
+     * @param {object} options the configuration of the loot condition
+     */
+    constructor(options){
+        this.options=options;
+    }
+    compile(){
+        return this.options;
+    }
+    /**
+     * Creates a copy of the loot condition
+     * @param {LootCondition} lootCondition 
+     */
+    static copy(lootCondition){
+        let copy=new lootCondition({});
         for(key in {...lootFunction})copy[key]=lootFunction[key];
         return copy;
     }
