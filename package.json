@@ -1,0 +1,40 @@
+{
+    "name": "@throw-out-error/minecraft-datapack",
+    "version": "1.6.6",
+    "description": "A module for making minecraft datapacks with node to cut down on the repetition.",
+    "main": "dist/index.js",
+    "scripts": {
+        "prepublishOnly": "npm test && npm run lint",
+        "prepare": "npm run build",
+        "version": "npm run format && git add -A src",
+        "build": "tsc --build",
+        "preversion": "npm run lint",
+        "format": "prettier --write \"src/**/*.ts\"",
+        "lint": "eslint src/**/*.ts"
+    },
+    "files": [
+        "dist/**/*"
+    ],
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^2.26.0",
+        "@typescript-eslint/parser": "^2.26.0",
+        "eslint": "^6.8.0",
+        "eslint-config-prettier": "^6.10.1",
+        "eslint-plugin-prettier": "^3.1.2",
+        "prettier": "^2.0.2",
+        "typescript": "^3.8.3"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/throw-out-error/minecraft-datapack.git"
+    },
+    "keywords": [
+        "minecraft",
+        "datapacks"
+    ],
+    "author": "brenttrenholme",
+    "license": "MIT",
+    "dependencies": {
+        "@types/node": "^13.9.8"
+    }
+}
