@@ -62,7 +62,7 @@ class LootTable {
      */
     static copy(lootTable){
         let copy=new LootTable("_");
-        for(key in {...lootTable})copy[key]=lootTable[key];
+        for(let key in {...lootTable})copy[key]=lootTable[key];
         return copy;
     }
 }
@@ -97,7 +97,7 @@ class LootPool {
     compile(){
         return {
             rolls:this.rolls,
-            bonus_rools:this.bonusRolls,
+            bonus_rolls:this.bonusRolls,
             entries:this.entries.map(entry=>entry.compile()),
             conditions:this.conditions.map(condition=>condition.compile())
         };
@@ -129,7 +129,7 @@ class LootPool {
      */
     static copy(lootPool){
         let copy=new LootPool({});
-        for(key in {...lootPool})copy[key]=lootPool[key];
+        for(let key in {...lootPool})copy[key]=lootPool[key];
         return copy;
     }
 }
@@ -169,7 +169,7 @@ class LootEntry {
      */
     static copy(lootEntry){
         let copy=new LootEntry(lootEntry.type);
-        for(key in {...lootEntry})copy[key]=lootEntry[key];
+        for(let key in {...lootEntry})copy[key]=lootEntry[key];
         return copy;
     }
 }
@@ -276,7 +276,7 @@ class LootFunction {
      */
     static copy(lootFunction) {
         let copy=new lootFunction({});
-        for(key in {...lootFunction})copy[key]=lootFunction[key];
+        for(let key in {...lootFunction})copy[key]=lootFunction[key];
         return copy;
     }
 }

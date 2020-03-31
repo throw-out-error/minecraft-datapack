@@ -1,6 +1,4 @@
-const fs=require("fs");
-
-const mkdirIfNotExist=path=>{if(!fs.existsSync(path))fs.mkdirSync(path,{recursive:true});};
+const {fs,mkdirIfNotExist,hasIllegalChars}=require("./utility");
 const dataCategories=[
     "functions",
     "tags/blocks",
@@ -10,7 +8,6 @@ const dataCategories=[
     "loot_tables",
     "predicates"
 ];
-const hasIllegalChars=s=>s!=s.replace(/[^0-9a-z_\-\.]/g,"");
 
 const recipes=require("./recipes");
 const Recipe=recipes.Recipe;
@@ -207,7 +204,7 @@ class Namespace {
      */
     static copy(namespace){
         let copy=new Namespace("_");
-        for(key in {...namespace})copy[key]=namespace[key];
+        for(let key in {...namespace})copy[key]=namespace[key];
         return copy;
     }
 }
