@@ -156,7 +156,7 @@ class LootEntry {
      * Generates the data associated with the entry
      * @returns {object|array} the generated json
      */
-    compile(){
+    compile(): object {
         return {type:this.type,conditions:this.conditions.map(condition=>condition.compile())};
     }
     /**
@@ -220,7 +220,7 @@ class ItemEntry extends LootEntry {
      * @returns {object|array} the generated json
      */
     //REEE
-    compile(){
+    compile():object {
         return {...this.output,...{functions:this.functions.map(f=>f.compile())}};
     }
 }
