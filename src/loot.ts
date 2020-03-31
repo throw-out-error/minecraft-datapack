@@ -1,13 +1,14 @@
-const {hasIllegalCharsSlash,mkdirIfNotExist,jsonBeautify,getDirname,fs}=require("./utility");
-
-const Condition=require("./predicate").Condition;
+import {hasIllegalCharsSlash,mkdirIfNotExist,jsonBeautify,getDirname,fs} from"./utility";
+import {Condition} from "./predicate";
 
 class LootTable {
+    path:string;
+    pools:LootPool[];
     /**
      * Creates a LootTable
      * @param {string} path The path of the loot table file relative to namespace/loot_tables (excluding the file extension)
      */
-    constructor(path){
+    constructor(path:string){
         if(hasIllegalCharsSlash(path))throw new Error("The names of loot tables can only contain the following characters 0-9, a-z, _, -, ., /");
         /** @type {string} The path of the loot table file relative to namespace/loot_tables */
         this.path=path;
@@ -18,7 +19,7 @@ class LootTable {
      * Outputs the loot table file
      * @param {string} path The root path for the loot table to compile to
      */
-    compile(path){
+    compile(path:string) {
         let tablePath=`${path}/${this.path}.json`;
         mkdirIfNotExist(getDirname(tablePath));
         fs.writeFileSync(tablePath,jsonBeautify({pools:this.pools.map(pool=>pool.compile())}));
@@ -28,7 +29,7 @@ class LootTable {
      * @param {LootPool} lootPool the loot pool to be added
      * @returns {LootPool} a reference to the added pool
      */
-    addPool(lootPool){
+    addPool(lootPool:LootPool): LootPool {
         let copy=LootPool.copy(lootPool);
         this.pools.push(copy);
         return copy;
@@ -37,7 +38,7 @@ class LootTable {
      * Remove one of the loot pools from the table
      * @param {number} index The index of the pool to be deleted
      */
-    deletePool(index){
+    deletePool(index:number){
         this.pools.splice(index);
     }
     /**
@@ -51,7 +52,7 @@ class LootTable {
      * @param {number} options.bonusRolls.max The maximum amount of bonus rolls (it get's multiplied by the players generic.luck attribute)
      * @returns {LootPool} a reference to the added loot pool
      */
-    createPool(options){
+    createPool(options:{rolls:{min:number,max:number}|number,bonusRolls:{min:number,max:number}|number}): LootPool {
         let pool=new LootPool(options);
         this.addPool(pool);
         return pool;
@@ -60,7 +61,7 @@ class LootTable {
      * Creates a copy of the loot table
      * @param {LootTable} lootTable 
      */
-    static copy(lootTable){
+    static copy(lootTable: LootTable):LootTable{
         let copy=new LootTable("_");
         for(let key in {...lootTable})copy[key]=lootTable[key];
         return copy;
@@ -68,6 +69,10 @@ class LootTable {
 }
 
 class LootPool {
+    rolls:{min:number,max:number}|number;
+    bonusRolls:{min:number,max:number}|number;
+    entries:LootEntry[];
+    conditions:Condition[];
     /**
      * Creates a LootPool
      * @param {object} options The configuration for the pool
@@ -107,7 +112,7 @@ class LootPool {
      * @param {LootEntry} entry the entry to be added to the pool
      * @returns {LootEntry} returns a reference to the added loot entry
      */
-    addEntry(entry){
+    addEntry(entry:LootEntry):LootEntry{
         let copy=LootEntry.copy(entry)
         this.entries.push(copy);
         return copy;
@@ -117,7 +122,7 @@ class LootPool {
      * @param {Condition} condition the condition to be added to the pool
      * @returns {Condition} returns a reference to the added condition
      */
-    addCondition(condition){
+    addCondition(condition:Condition):Condition{
         let copy=Condition.copy(condition)
         this.conditions.push(copy);
         return copy;
@@ -127,7 +132,7 @@ class LootPool {
      * @param {LootPool} lootPool
      * @returns {LootPool} a copy of the loot pool 
      */
-    static copy(lootPool){
+    static copy(lootPool:LootPool):LootPool{
         let copy=new LootPool({});
         for(let key in {...lootPool})copy[key]=lootPool[key];
         return copy;
@@ -135,6 +140,8 @@ class LootPool {
 }
 
 class LootEntry {
+    type:'minecraft:item'|'minecraft:loot_table'|'minecraft:empty';
+    conditions:Condition[];
     /**
      * Creates a LootEntry
      * @param {('minecraft:item'|'minecraft:loot_table'|'minecraft:empty')} type the type of loot entry 
@@ -157,7 +164,7 @@ class LootEntry {
      * @param {Condition} condition the condition to be added to the pool
      * @returns {Condition} returns a reference to the added condition
      */
-    addCondition(condition){
+    addCondition(condition:Condition):Condition{
         let copy=Condition.copy(condition)
         this.conditions.push(copy);
         return copy;
@@ -167,7 +174,7 @@ class LootEntry {
      * @param {LootEntry} lootEntry
      * @returns {LootEntry} a copy of the loot entry 
      */
-    static copy(lootEntry){
+    static copy(lootEntry:LootEntry):LootEntry{
         let copy=new LootEntry(lootEntry.type);
         for(let key in {...lootEntry})copy[key]=lootEntry[key];
         return copy;
@@ -175,6 +182,8 @@ class LootEntry {
 }
 
 class ItemEntry extends LootEntry {
+    output:object;
+    functions:LootFunction[];
     /**
      * Creates an ItemEntry
      * @param {object} options the configuration for the item entry
@@ -184,6 +193,7 @@ class ItemEntry extends LootEntry {
      */
     constructor(options){
         super('minecraft:item');
+        /** @typedef {object} */
         this.output={...this.output,...{name:options.name,weight:options.weight}};
         /** @type {LootFunction[]} the entries array of functions */
         this.functions=[];
@@ -192,7 +202,7 @@ class ItemEntry extends LootEntry {
      * Adds a function to the item entry
      * @param {LootFunction} lootFunction the function to be added 
      */
-    addFunction(lootFunction){
+    addFunction(lootFunction:LootFunction){
         this.functions.push(lootFunction);
     }
     /**
@@ -200,7 +210,7 @@ class ItemEntry extends LootEntry {
      * @param {object} options the configuration of the function to be added
      * @returns {LootFunction} the loot function created
      */
-    createFunction(options){
+    createFunction(options:object):LootFunction{
         let funct=new LootFunction(options);
         this.functions.push(funct);
         return funct;
@@ -209,12 +219,14 @@ class ItemEntry extends LootEntry {
      * Generates the data associated with the item entry
      * @returns {object|array} the generated json
      */
+    //REEE
     compile(){
         return {...this.output,...{functions:this.functions.map(f=>f.compile())}};
     }
 }
 
 class EmptyEntry extends LootEntry {
+    output:object;
     /**
      * Creates an EmptyEntry
      * @param {object} options the configuration for the empty entry
@@ -228,6 +240,7 @@ class EmptyEntry extends LootEntry {
 }
 
 class LootTableEntry extends LootEntry {
+    output:object;
     /**
      * Creates a LootTableEntry
      * @param {object} options the configuration of the loot table entry
@@ -242,11 +255,13 @@ class LootTableEntry extends LootEntry {
 }
 
 class LootFunction {
+    options:object;
+    conditions:Condition[];
     /**
      * Creates a LootFunction
      * @param {object} options the configuration of the loot function
      */
-    constructor(options){
+    constructor(options:object){
         /** @type {object} the configuration of the function */
         this.options=options;
         /** @type {Condition[]} */
@@ -264,7 +279,7 @@ class LootFunction {
      * @param {Condition} condition the condition to be added to the pool
      * @returns {Condition} returns a reference to the added condition
      */
-    addCondition(condition){
+    addCondition(condition:Condition):Condition{
         let copy=Condition.copy(condition)
         this.conditions.push(copy);
         return copy;
@@ -280,7 +295,7 @@ class LootFunction {
         return copy;
     }
 }
-module.exports={
+export {
     LootTable,
     LootPool,
     LootEntry,

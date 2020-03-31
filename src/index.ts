@@ -1,5 +1,5 @@
-const {fs,mkdirIfNotExist,hasIllegalChars}=require("./utility");
-const dataCategories=[
+import {fs,mkdirIfNotExist,hasIllegalChars} from "./utility";
+const dataCategories: string[]=[
     "functions",
     "tags/blocks",
     "tags/items",
@@ -9,14 +9,20 @@ const dataCategories=[
     "predicates"
 ];
 
-const recipes=require("./recipes");
-const Recipe=recipes.Recipe;
-const loot=require("./loot");
-const LootTable=loot.LootTable;
-const predicate=require("./predicate");
-const Tag=require("./tag");
+import {Tag} from "./tag"; 
+import * as recipes from "./recipes";
+import {Recipe} from "./recipes";
+import * as loot from"./loot";
+import {LootTable} from "./loot";
+import * as predicate from "./predicate";
 
 class Datapack {
+    name:string;
+    path:string;
+    format:number;
+    description:string;
+    minecraft:Namespace;
+    namespaces:object;
     /**
      * Creates a datapack
      * @param {string} name The name of the datapack
@@ -24,23 +30,16 @@ class Datapack {
      * @param {object} options Additional information regarding variable names and the pack.mcmeta file
      * @param {number} [options.foramt=5] The datapack format version
      * @param {string} [options.description=name] The datapack's description
-     * @param {string} [options.globalNamespace=A filtered version of the name] The global namespace used for scoreboards, entity tags, data storage, etc. in the datapack. Content in sub folders will use the namespace global_namespace.folder_name
-     * @param {string} [options.coreFunctionNamespace="core"] The namespace used for the core functionality of the classes function compiler, used for storing files used for all non-vanilla functionality added to the mcfunctions by the class
      */
-    constructor(name,path,options){
+    constructor(name: string,path: string,options: {format?: number, description?:string}){
         /** @type {string} the name of the datapack */
         this.name=name;
         /** @type {string} the root folder the datapack will compile to */
         this.path=path;
-        /** @type {string} the namespace used for scoreboards, entity tags, data storage, etc. in the datapack */
-        this.globalNamespace=options.globalNamespace||name.toLowerCase().replace(/\s/g,"_").replace(/[^0-9a-z_\-\.]/g,"");
         /** @type {number} the format version of the datapack */
         this.format=options.format||5;
         /** @type {string} the description of the datapack */
         this.description=options.description||this.name;
-        /** @type {string} the name of the core namespace for functions */
-        if(hasIllegalChars(options.coreFunctionNamespace||""))throw new Error("Namespace names can only contain the following characters 0-9, a-z, _, -, .");
-        this.coreFunctionNamespace=options.coreFunctionNamespace||'core';
         /** @type {Namespace} the datapacks minecraft folder */
         this.minecraft=new (class Minecraft extends Namespace{
             constructor(){
@@ -48,7 +47,7 @@ class Datapack {
                 this.name="minecraft";
             }
         })();
-        /** @type {Namespace[]} the namespaces the datapack will use */
+        /** @type {object} the namespaces the datapack will use */
         this.namespaces={};
     }
     /**
@@ -65,7 +64,7 @@ class Datapack {
      * @param {Namespace} namespace The namespace to be added
      * @returns {Namespace} a reference to the added namespace
      */
-    addNamespace(namespace){
+    addNamespace(namespace: Namespace): Namespace {
         if(this.namespaces.hasOwnProperty(namespace.name))throw new Error(`The namespace ${namespace.name} has already been added to this datapack`);
         let copy=Namespace.copy(namespace);
         this.namespaces[namespace.name]=copy;
@@ -76,7 +75,7 @@ class Datapack {
      * @param {string} name The name of the namespace
      * @returns {Namespace} a reference to the created namespace 
      */
-    createNamespace(name){
+    createNamespace(name: string): Namespace {
         let namespace=new Namespace(name)
         this.addNamespace(namespace);
         return namespace
@@ -91,11 +90,17 @@ class Datapack {
 }
 
 class Namespace {
+    name:string;
+    blockTags:object;
+    itemTags:object;
+    functionTags:object;
+    recipes:object
+    lootTables:object
     /**
      * Creates a namespace
      * @param {string} name The name of the namespace
      */
-    constructor(name){
+    constructor(name: string){
         if(hasIllegalChars(name))throw new Error("Namespace names can only contain the following characters 0-9, a-z, _, -, .");
         if(name=="minecraft")throw new Error("The Datapack class creates the minecraft namespace by default, datapack.minecraft, adding it a second time will cause it to be overridden")
         /** @type {string} the name of the namespace */
@@ -115,7 +120,7 @@ class Namespace {
      * Outputs the namespace's files
      * @param {string} path The root path where the namespace will compile
      */
-    compile(path){
+    compile(path: string) {
         let namespacePath=`${path}/data/${this.name}`
         mkdirIfNotExist(namespacePath);
         dataCategories.forEach(category=>{
@@ -132,7 +137,7 @@ class Namespace {
      * @param {Tag} tag The tag to be added
      * @returns {Tag} a reference to the added tag 
      */
-    addTag(tag){
+    addTag(tag: Tag): Tag {
         if(this[`${tag.type}Tags`].hasOwnProperty(tag.path))throw new Error(`The tag ${tag.type}/${tag.path} has already been added to this namespace`);
         let copy=Tag.copy(tag);
         this[`${tag.type}Tags`][tag.path]=copy;
@@ -145,7 +150,7 @@ class Namespace {
      * @param {string[]} [values=[]] 
      * @returns {Tag} a reference to the created tag
      */
-    createTag(path,type,values){
+    createTag(path: string,type: 'block'|'item'|'function',values?: string[]): Tag {
         let tag=new Tag(path,type,values||[]);
         this.addTag(tag);
         return tag;
@@ -156,14 +161,14 @@ class Namespace {
      * @param {('block'|'item'|'function')} type The type of tag to be deleted
      */
     deleteTag(path,type){
-        delete this.tags[`${type}/${path}`];
+        delete this[`${type}Tags`][path];
     }
     /**
      * Add a recipe to the namespace
      * @param {Recipe} recipe The recipe to be added
      * @returns {Recipe} a reference to the added recipe
      */
-    addRecipe(recipe){
+    addRecipe(recipe: Recipe): Recipe {
         if(this.recipes.hasOwnProperty(recipe.path))throw new Error(`The recipe ${recipe.path} has already been added to this namespace`)
         let copy=Recipe.copy(recipe);
         this.recipes[recipe.path]=copy;
@@ -181,8 +186,8 @@ class Namespace {
      * @param {LootTable} lootTable The loot table to be added
      * @returns {LootTable} a reference to the added loot table
      */
-    addLootTable(lootTable){
-        if(this.lootTables.hasOwnProperty(lootTable.path))throw new Error(`This name space already has the loot table ${path}`);
+    addLootTable(lootTable: LootTable): LootTable {
+        if(this.lootTables.hasOwnProperty(lootTable.path))throw new Error(`This name space already has the loot table ${lootTable.path}`);
         let copy=LootTable.copy(lootTable);
         this.lootTables[lootTable.path]=copy;
         return copy;
@@ -192,7 +197,7 @@ class Namespace {
      * @param {string} path the path of the loot table to be created 
      * @returns {LootTable} a reference to the created pool
      */
-    createLootTable(path){
+    createLootTable(path: string): LootTable {
         let lootTable=new LootTable(path)
         this.addLootTable(lootTable);
         return lootTable;
@@ -202,18 +207,17 @@ class Namespace {
      * @param {Namespace} namespace the namespace to be copied
      * @returns {Namespace} a copy of the namespace
      */
-    static copy(namespace){
+    static copy(namespace: Namespace): Namespace {
         let copy=new Namespace("_");
         for(let key in {...namespace})copy[key]=namespace[key];
         return copy;
     }
 }
-
-module.exports={
+export {
     Datapack,
     Namespace,
     Tag,
     recipes,
     loot,
     predicate
-};
+}

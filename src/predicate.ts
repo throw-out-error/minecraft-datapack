@@ -1,20 +1,21 @@
 class Condition {
+    options:object;
     /**
      * @param {object} options the configuration of the loot condition
      */
-    constructor(options){
+    constructor(options:object){
         this.options=options;
     }
-    compile(){
+    compile() {
         return this.options;
     }
     /**
      * Creates a copy of the loot condition
-     * @param {LootCondition} lootCondition 
+     * @param {Condition} Condition 
      */
-    static copy(lootCondition){
-        let copy=new lootCondition({});
-        for(key in {...lootFunction})copy[key]=lootFunction[key];
+    static copy(condition:Condition){
+        let copy=new Condition({});
+        for(let key in {...Condition})copy[key]=condition[key];
         return copy;
     }
 }
@@ -23,6 +24,6 @@ class Predicate {
 
 }
 
-module.exports={
+export {
     Condition
 }
