@@ -1,6 +1,6 @@
 {
   "name": "@throw-out-error/minecraft-datapack",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "description": "A module for making minecraft datapacks with node to cut down on the repetition.",
   "main": "src/index.js",
   "scripts": {},
