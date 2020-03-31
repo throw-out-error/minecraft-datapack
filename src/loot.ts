@@ -194,7 +194,7 @@ class ItemEntry extends LootEntry {
     constructor(options){
         super('minecraft:item');
         /** @typedef {object} */
-        this.output={...this.output,...{name:options.name,weight:options.weight}};
+        this.output={name:options.name,weight:options.weight};
         /** @type {LootFunction[]} the entries array of functions */
         this.functions=[];
     }
