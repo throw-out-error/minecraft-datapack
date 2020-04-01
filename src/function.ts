@@ -38,7 +38,7 @@ class Value {
      * Outputs the value as a string
      */
     compile(): string {
-        return this.value+['int','float','double','long'].includes(this.type)?this.type.slice(0,1):'';
+        return this.value+(['int','float','double','long'].includes(this.type)?this.type.slice(0,1):'');
     }
 }
 
@@ -54,7 +54,13 @@ class ValueArray {
         this.values=values||[];
         for(let v of this.values)if(v.type!=this.type)throw new Error(`Error: can't pass value of type ${v.type} to value array of type ${this.type}`);
     }
-}
+    /**
+     * Output the value array as a string
+     */
+    compile():string{
+        return `[${this.values.map(v=>v.compile()).join(", ")}]`;
+    }
+} 
 
 export {
     Command,
