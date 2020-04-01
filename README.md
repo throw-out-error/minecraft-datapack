@@ -127,7 +127,7 @@ datapack.compile()
 // note: this feature is still WIP;
 const {
   Datapack,
-  function: { Command, Function },
+  function: { Command, Function, Selector },
 } = require('@throw-out-error/minecraft-datapack')
 
 let datapack = new Datapack('Functions', __dirname, {
@@ -138,7 +138,7 @@ let datapack = new Datapack('Functions', __dirname, {
 let n = datapack.createNamespace('crazy_function')
 
 let funct = n.addFunction(new Function('1'))
-funct.addCommand(new Command('say', ['hello']))
+funct.addCommand(new Command('kill', [new Selector('entity',{type:"!player"})]))
 
 datapack.compile()
 

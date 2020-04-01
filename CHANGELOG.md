@@ -27,6 +27,11 @@ console.log(
 ```
 
 Added a function class, and the ability to add mcfunctions to datapacks :O
+Added the Selector class for commands
+```js
+new Selector('entity');
+new Selector('e');
+```
 
 - Converted code to typescript
 
