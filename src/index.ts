@@ -17,7 +17,7 @@ import * as loot from "./loot";
 import { LootTable } from "./loot";
 import * as predicate from "./predicate";
 import * as mcfunction from "@throw-out-error/minecraft-mcfunction";
-import { Function } from "./function";
+import {McFunction} from "@throw-out-error/minecraft-mcfunction";
 
 export class Datapack {
   name: string;
@@ -112,7 +112,7 @@ export class Namespace {
   functionTags: { [key: string]: Tag };
   recipes: { [key: string]: Recipe };
   lootTables: { [key: string]: LootTable };
-  functions: { [key: string]: Function };
+  functions: { [key: string]: McFunction };
   /**
    * Creates a namespace
    * @param {string} name The name of the namespace
@@ -249,12 +249,12 @@ export class Namespace {
    * Add a function to the namespace
    * @param {Function} funct the function to be added
    */
-  addFunction(funct: Function): Function {
+  addFunction(funct: McFunction): McFunction {
     if (Object.prototype.hasOwnProperty.call(this.functions, funct.path))
       throw new Error(
         `This name space already has the loot function ${funct.path}`
       );
-    let copy = Function.copy(funct);
+    let copy = McFunction.copy(funct);
     this.functions[funct.path] = copy;
     return copy;
   }
@@ -262,8 +262,8 @@ export class Namespace {
    * Creates a Function and adds it to the class
    * @param {string} path the path of the mcfunction relative to namespace/functions (excluding file extension)
    */
-  createFunction(path: string): Function {
-    let funct = new Function(path);
+  createFunction(path: string): McFunction {
+    let funct = new McFunction(path);
     this.addFunction(funct);
     return funct;
   }

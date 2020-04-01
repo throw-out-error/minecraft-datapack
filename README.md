@@ -137,7 +137,7 @@ let datapack = new Datapack('Functions', __dirname, {
 
 let n = datapack.createNamespace('crazy_function')
 
-let funct = n.addFunction(new Function('1'))
+let funct = n.addFunction(new McFunction('1'))
 funct.addCommand(new Command('kill', [new Selector('entity',{type:"!player"})]))
 
 datapack.compile()
