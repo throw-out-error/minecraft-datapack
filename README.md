@@ -12,14 +12,14 @@ const { Datapack, Namespace } = require('minecraft-datapack')
 const myDatapack = new Datapack('My datapack', __dirname, {
   description: 'my cool datapack!',
 })
-//You can use addNamespace to add a precreated namespace
+// You can use addNamespace to add a precreated namespace
 let namespace = new Namespace('namespace')
 myDatapack.addNamespace(namespace)
-//Or you can use createNamespace to create and add a namespace
+// Or you can use createNamespace to create and add a namespace
 myDatapack.createNamespace('namespace2')
-//And you can delete them with deleteNamespace
+// And you can delete them with deleteNamespace
 myDatapack.deleteNamespace('namespace2')
-//Use the compile method of the datapack class to output the files
+// Use the compile method of the datapack class to output the files
 myDatapack.compile()
 ```
 
@@ -28,10 +28,10 @@ myDatapack.compile()
 ```js
 const { Datapack } = require('minecraft-datapack')
 const datapack = new Datapack('ree', __dirname, { description: 'REE!' })
-//Creates a block tag called minecraft:beacon_base_blocks, with the values ["minecraft:dirt"]
+// Creates a block tag called minecraft:beacon_base_blocks, with the values ["minecraft:dirt"]
 datapack.minecraft.createTag('beacon_base_blocks', 'block', ['minecraft:dirt'])
 datapack.compile()
-//Now when you load this in your minecraft world you can have beacon pyramids made from dirt! :D
+// Now when you load this in your minecraft world you can have beacon pyramids made from dirt! :D
 ```
 
 ## Adding smelting recipes
@@ -51,19 +51,19 @@ stone_conversion.createTag('stone_variants', 'item', [
   'minecraft:andesite',
   'minecraft:granite',
 ])
-//Add a recipe using the namespace class's addRecipe method
+// Add a recipe using the namespace class's addRecipe method
 stone_conversion.addRecipe(
   new SmeltingRecipe('stone_conversion', {
-    //The ingredient can be a tag or an item id eg. minecraft:dirt, if using a tag it must be pre-fixed with a #
+    // The ingredient can be a tag or an item id eg. minecraft:dirt, if using a tag it must be pre-fixed with a #
     ingredient: '#stone_conversion:stone_variants',
     result: 'minecraft:stone',
     experience: 1,
-    //Select which smelting block you want to use eg. a furnace, blast furnace, smoker, or camp fire
+    // Select which smelting block you want to use eg. a furnace, blast furnace, smoker, or camp fire
     type: 'minecraft:blasting',
   })
 )
 datapack.compile()
-//When loaded in your minecraft world you can put granite, diorite, and andesite in a blast furnace to get stone :D
+// When loaded in your minecraft world you can put granite, diorite, and andesite in a blast furnace to get stone :D
 ```
 
 ## Adding crafting recipes
@@ -108,28 +108,39 @@ const datapack = new Datapack('Dirt', __dirname, {
 })
 datapack
   .createNamespace('dirt')
-  //create the loot table
+  // create the loot table
   .createLootTable('dirt')
-  //add a pool to the table
+  // add a pool to the table
   .createPool({
     rolls: 1,
   })
-  //add an item to the pool
+  // add an item to the pool
   .addEntry(new ItemEntry({ name: 'minecraft:dirt' }))
   .addFunction(randomCount(1, 64))
 datapack.compile()
-//if you run /loot give @s dirt:dirt ingame you will get 1-64 dirt
+// if you run /loot give @s dirt:dirt ingame you will get 1-64 dirt
 ```
 
-### Adding funcions
+### Adding functions
 
 ```js
-//note: this feature is still WIP;
-const {Datapack,function:{Command,Function}}=require("@throw-out-error/minecraft-datapack);
-let datapack=new Datapack("Functions",__dirname,{description:"A cool datapack that adds a really mind blowing function, /function crazy_function:1"});
-let n=datapack.createNamespace("crazy_function");
-let funct=n.addFunction(new Function("1"));
-funct.addCommand(new Command("say",["hello"]));
-datapack.compile();
-//Execute the command /function crazy_function:1 to run the mind blowing function
+// note: this feature is still WIP;
+const {
+  Datapack,
+  function: { Command, Function },
+} = require('@throw-out-error/minecraft-datapack')
+
+let datapack = new Datapack('Functions', __dirname, {
+  description:
+    'A cool datapack that adds a really mind blowing function, /function crazy_function:1',
+})
+
+let n = datapack.createNamespace('crazy_function')
+
+let funct = n.addFunction(new Function('1'))
+funct.addCommand(new Command('say', ['hello']))
+
+datapack.compile()
+
+// Execute the command /function crazy_function:1 to run the mind blowing function
 ```
