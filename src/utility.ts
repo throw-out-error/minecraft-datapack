@@ -30,19 +30,27 @@ function jsonBeautify(object: object | Array<any>): string {
   }
   return json.join("");
 }
+
 function mkdirIfNotExist(path: string) {
   if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
 }
+
 function hasIllegalChars(s: string): boolean {
   return s != s.replace(/[^0-9a-z_\-.]/g, "");
 }
+
 function hasIllegalCharsSlash(s: string): boolean {
   return s != s.replace(/[^0-9a-z_\-./]/g, "");
 }
+
 function itemArrayFromString(s: string): Array<any> {
   return s
     .split("||")
     .map((s) => (s[0] == "#" ? { tag: s.slice(1) } : { item: s }));
+}
+
+function assumeMinecraft(s:string): string {
+  return s.includes(":")?s:`minecraft:${s}`;
 }
 
 export {
@@ -53,4 +61,5 @@ export {
   hasIllegalCharsSlash,
   itemArrayFromString,
   fs,
+  assumeMinecraft
 };

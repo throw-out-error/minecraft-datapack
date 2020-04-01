@@ -4,6 +4,7 @@ import {
   jsonBeautify,
   getDirname,
   fs,
+  assumeMinecraft
 } from "./utility";
 
 /**
@@ -36,7 +37,7 @@ class Tag {
     /** @type {string} the type of tag it is */
     this.type = type;
     /** @type {string[]} the values of the tag */
-    this.values = values || [];
+    this.values = (values || []).map(assumeMinecraft);
   }
   /**
    * Outputs the tag file
@@ -52,7 +53,7 @@ class Tag {
    * @param {string} value the value to be added
    */
   addValue(value: string) {
-    this.values.push(value);
+    this.values.push(assumeMinecraft(value));
   }
   /**
    * Removes a value from the tag

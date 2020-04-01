@@ -5,6 +5,7 @@ import {
   getDirname,
   fs,
   itemArrayFromString,
+  assumeMinecraft
 } from "./utility";
 
 class Recipe {
@@ -80,7 +81,7 @@ class SmeltingRecipe extends Recipe {
     /** @type {string} The contents of the outputted file */
     this.file_contents = {
       type: options.type || "minecraft:smelting",
-      ingredient: itemArrayFromString(options.ingredient),
+      ingredient: itemArrayFromString(options.ingredient.split("||").map(assumeMinecraft).join("||")),
       result: options.result,
       experience: options.experience,
       cookingtime: options.cookingtime || 200,
@@ -105,7 +106,7 @@ class StonecutterRecipe extends Recipe {
     /** @type The contents of the outputted file */
     this.file_contents = {
       type: "minecraft:stonecutting",
-      ingredient: itemArrayFromString(options.ingredient),
+      ingredient: itemArrayFromString(options.ingredient.split("||").map(assumeMinecraft).join("||")),
       result: options.result,
       count: options.count || 1,
     };
@@ -130,7 +131,7 @@ class ShapelessCraftingRecipe extends Recipe {
     this.file_contents = {
       type: "minecraft:crafting_shapeless",
       ingredients: options.ingredients.map((ingredient) =>
-        itemArrayFromString(ingredient)
+        itemArrayFromString(ingredient.split("||").map(assumeMinecraft).join("||"))
       ),
       result: {
         item: options.result,
@@ -155,10 +156,12 @@ class ShapedCraftingRecipe extends Recipe {
     options: { pattern: string[]; key: object; result: string; count?: number }
   ) {
     super(path, "shaped");
+    let key;
+    for(let k in options.key)key[k]=assumeMinecraft(options.key[k]);
     this.file_contents = {
       type: "minecraft:crafting_shaped",
       pattern: options.pattern,
-      key: options.key,
+      key,
       result: {
         item: options.result,
         count: options.count || 1,

@@ -7,7 +7,12 @@ Due to demand from our users(i.e. one person) we have decided to change this upd
 Added Command class and Value class!  
 Added ValueArray class!
 ```js 
-const {Command,Value}=require("@throw-out-error/minecraft-datapack").function;
+const {Command,Value,ValueArray}=require("@throw-out-error/minecraft-datapack").function;
+```
+Changed how the constructors of the classes work to make them imply a minecraft namespace for certain parameters
+```js
+console.log(new (require("@throw-out-error/minecraft-datapack").Tag)("_","item",["dirt","stone"]).values)
+//prints: ["minecraft:dirt","minecraft:stone"]
 ```
 
 - Converted code to typescript
