@@ -1,29 +1,32 @@
-import { getDirname, mkdirIfNotExist, fs } from './utility'
-class Function {
-  commands: Command[]
-  path: string
+import { mkdirIfNotExist } from "./utility";
+import fs from "fs";
+import { dirname as getDirname } from "path";
+
+export class Function {
+  commands: Command[];
+  path: string;
   /**
    * @param {string} path the path of the file relative to namspace/functions
    */
   constructor(path: string) {
-    this.path = path
-    this.commands = []
+    this.path = path;
+    this.commands = [];
   }
   compile(path: string) {
-    let functionPath = `${path}/${this.path}.mcfunction`
-    mkdirIfNotExist(getDirname(functionPath))
+    let functionPath = `${path}/${this.path}.mcfunction`;
+    mkdirIfNotExist(getDirname(functionPath));
     fs.writeFileSync(
       functionPath,
-      this.commands.map(c => c.compile()).join('\n')
-    )
+      this.commands.map((c) => c.compile()).join("\n")
+    );
   }
   /**
    * Add a command to the function
    * @param {Command} command the command to be added
    */
   addCommand(command: Command) {
-    this.commands.push(command)
-    return this
+    this.commands.push(command);
+    return this;
   }
   /**
    * Copies the function
@@ -31,50 +34,50 @@ class Function {
    * @returns {Function} a reference to the function
    */
   static copy(funct: Function): Function {
-    let copy = new Function('_')
-    for (let key in { ...funct }) copy[key] = funct[key]
-    return copy
+    let copy = new Function("_");
+    for (let key in { ...funct }) copy[key] = funct[key];
+    return copy;
   }
 }
 
-class Command {
-  method: string
-  params: Array<Value | string>
+export class Command {
+  method: string;
+  params: Array<Value | string>;
   /**
    * @param {string} method the command to be executed
    * @param {Array<Value|string>} params the parameters to be passed to the command
    */
   constructor(method: string, params: Array<Value | string>) {
-    this.method = method
-    this.params = params
+    this.method = method;
+    this.params = params;
   }
   /**
    * Outputs the command as a string
    */
   compile(): string {
     return `${this.method} ${this.params
-      .map(p => (p instanceof Value ? p.compile() : p))
-      .join(' ')}`
+      .map((p) => (p instanceof Value ? p.compile() : p))
+      .join(" ")}`;
   }
 }
 
-class Value {
-  type: string
-  value: string
+export class Value {
+  type: string;
+  value: string;
   /**
    * @param {string} type the type of the value
    * @param {any} value the value that will be cast to a string
    */
   constructor(
-    type: 'int' | 'float' | 'double' | 'long' | 'string',
+    type: "int" | "float" | "double" | "long" | "string",
     value: any
   ) {
-    if (['int', 'float', 'double', 'long'].includes(type)) {
-      this.type = type
-      this.value = value.toString()
+    if (["int", "float", "double", "long"].includes(type)) {
+      this.type = type;
+      this.value = value.toString();
     } else {
-      this.type = 'string'
-      this.value = `"${value}"`
+      this.type = "string";
+      this.value = `"${value}"`;
     }
   }
   /**
@@ -83,35 +86,33 @@ class Value {
   compile(): string {
     return (
       this.value +
-      (['int', 'float', 'double', 'long'].includes(this.type)
+      (["int", "float", "double", "long"].includes(this.type)
         ? this.type.slice(0, 1)
-        : '')
-    )
+        : "")
+    );
   }
 }
 
-class ValueArray {
-  type: string
-  values: Value[]
+export class ValueArray {
+  type: string;
+  values: Value[];
   /**
    * @param {string} type the type of array to be created
    * @param {Value[]} values the elements of the array
    */
   constructor(type: string, values?: Value[]) {
-    this.type = type
-    this.values = values || []
+    this.type = type;
+    this.values = values || [];
     for (let v of this.values)
       if (v.type != this.type)
         throw new Error(
           `Error: can't pass value of type ${v.type} to value array of type ${this.type}`
-        )
+        );
   }
   /**
    * Output the value array as a string
    */
   compile(): string {
-    return `[${this.values.map(v => v.compile()).join(', ')}]`
+    return `[${this.values.map((v) => v.compile()).join(", ")}]`;
   }
 }
-
-export { Function, Command, Value, ValueArray }

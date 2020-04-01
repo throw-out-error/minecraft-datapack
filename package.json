@@ -36,6 +36,7 @@
     "author": "brenttrenholme",
     "license": "MIT",
     "dependencies": {
+        "@throw-out-error/minecraft-mcfunction": "^1.0.0",
         "@types/node": "^13.9.8"
     }
 }

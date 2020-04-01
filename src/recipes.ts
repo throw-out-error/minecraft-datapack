@@ -2,16 +2,16 @@ import {
   hasIllegalCharsSlash,
   mkdirIfNotExist,
   jsonBeautify,
-  getDirname,
-  fs,
   itemArrayFromString,
   assumeMinecraft,
-} from './utility'
+} from "./utility";
+import fs from "fs";
+import { dirname as getDirname } from "path";
 
-class Recipe {
-  type: 'smelting' | 'shapeless' | 'shaped' | 'stonecutting'
-  path: string
-  file_contents: object
+export class Recipe {
+  type: "smelting" | "shapeless" | "shaped" | "stonecutting";
+  path: string;
+  file_contents: object;
   /**
    * Creates a Recipe
    * @param {string} path  The path of the recipe file relative to namespace/recipes (excluding the file extension)
@@ -19,40 +19,40 @@ class Recipe {
    */
   constructor(
     path: string,
-    type: 'smelting' | 'shapeless' | 'shaped' | 'stonecutting'
+    type: "smelting" | "shapeless" | "shaped" | "stonecutting"
   ) {
     /** @type {string} The type of recipe */
-    this.type = type
+    this.type = type;
     if (hasIllegalCharsSlash(path))
       throw new Error(
-        'The names of recipes can only contain the following characters 0-9, a-z, _, -, ., /'
-      )
+        "The names of recipes can only contain the following characters 0-9, a-z, _, -, ., /"
+      );
     /** @type {string} The path of the recipe file relative to namespace/recipes (excluding the file extension) */
-    this.path = path
+    this.path = path;
     /** @type {object} The content of the file when it is compiled */
-    this.file_contents = {}
+    this.file_contents = {};
   }
   /**
    * Outputs the recipe json file
    * @param {string} path The path of the namespace the recipe will compile to
    */
   compile(path: string) {
-    let recipePath = `${path}/${this.path}.json`
-    mkdirIfNotExist(getDirname(recipePath))
-    fs.writeFileSync(recipePath, jsonBeautify(this.file_contents))
+    let recipePath = `${path}/${this.path}.json`;
+    mkdirIfNotExist(getDirname(recipePath));
+    fs.writeFileSync(recipePath, jsonBeautify(this.file_contents));
   }
   /**
    * Creates a copy of the recipe
    * @param {Recipe} recipe
    */
   static copy(recipe: Recipe): Recipe {
-    let copy = new Recipe('_', 'shapeless')
-    for (let key in { ...recipe }) copy[key] = recipe[key]
-    return copy
+    let copy = new Recipe("_", "shapeless");
+    for (let key in { ...recipe }) copy[key] = recipe[key];
+    return copy;
   }
 }
 
-class SmeltingRecipe extends Recipe {
+export class SmeltingRecipe extends Recipe {
   /**
    * Creates a SmeltingRecipe
    * @param {string} path  The path of the recipe file relative to namespace/recipes (excluding the file extension)
@@ -67,31 +67,31 @@ class SmeltingRecipe extends Recipe {
     path: string,
     options: {
       type?:
-        | 'minecraft:smelting'
-        | 'minecraft:blasting'
-        | 'minecraft:campfire_cooking'
-        | 'smelting'
-      ingredient: string
-      result: string
-      experience: number
-      cookingtime?: number
+        | "minecraft:smelting"
+        | "minecraft:blasting"
+        | "minecraft:campfire_cooking"
+        | "smelting";
+      ingredient: string;
+      result: string;
+      experience: number;
+      cookingtime?: number;
     }
   ) {
-    super(path, 'smelting')
+    super(path, "smelting");
     /** @type {string} The contents of the outputted file */
     this.file_contents = {
-      type: options.type || 'minecraft:smelting',
+      type: options.type || "minecraft:smelting",
       ingredient: itemArrayFromString(
-        options.ingredient.split('||').map(assumeMinecraft).join('||')
+        options.ingredient.split("||").map(assumeMinecraft).join("||")
       ),
       result: options.result,
       experience: options.experience,
       cookingtime: options.cookingtime || 200,
-    }
+    };
   }
 }
 
-class StonecutterRecipe extends Recipe {
+export class StonecutterRecipe extends Recipe {
   /**
    * Creates a StonecuttingRecipe
    * @param {string} path  The path of the recipe file relative to namespace/recipes (excluding the file extension)
@@ -104,20 +104,20 @@ class StonecutterRecipe extends Recipe {
     path: string,
     options: { ingredient: string; result: string; count?: number }
   ) {
-    super(path, 'stonecutting')
+    super(path, "stonecutting");
     /** @type The contents of the outputted file */
     this.file_contents = {
-      type: 'minecraft:stonecutting',
+      type: "minecraft:stonecutting",
       ingredient: itemArrayFromString(
-        options.ingredient.split('||').map(assumeMinecraft).join('||')
+        options.ingredient.split("||").map(assumeMinecraft).join("||")
       ),
       result: options.result,
       count: options.count || 1,
-    }
+    };
   }
 }
 
-class ShapelessCraftingRecipe extends Recipe {
+export class ShapelessCraftingRecipe extends Recipe {
   /**
    * Creates a ShaplessCraftingRecipe
    * @param {string} path  The path of the recipe file relative to namespace/recipes (excluding the file extension)
@@ -130,24 +130,24 @@ class ShapelessCraftingRecipe extends Recipe {
     path: string,
     options: { ingredients: string[]; result: string; count?: number }
   ) {
-    super(path, 'shapeless')
+    super(path, "shapeless");
     /** @type {string} The contents of the outputted file */
     this.file_contents = {
-      type: 'minecraft:crafting_shapeless',
-      ingredients: options.ingredients.map(ingredient =>
+      type: "minecraft:crafting_shapeless",
+      ingredients: options.ingredients.map((ingredient) =>
         itemArrayFromString(
-          ingredient.split('||').map(assumeMinecraft).join('||')
+          ingredient.split("||").map(assumeMinecraft).join("||")
         )
       ),
       result: {
         item: options.result,
         count: options.count || 1,
       },
-    }
+    };
   }
 }
 
-class ShapedCraftingRecipe extends Recipe {
+export class ShapedCraftingRecipe extends Recipe {
   /**
    * Creates a ShapedCraftingRecipe
    * @param {string} path  The path of the recipe file relative to namespace/recipes (excluding the file extension)
@@ -161,24 +161,17 @@ class ShapedCraftingRecipe extends Recipe {
     path: string,
     options: { pattern: string[]; key: object; result: string; count?: number }
   ) {
-    super(path, 'shaped')
-    let key
-    for (let k in options.key) key[k] = assumeMinecraft(options.key[k])
+    super(path, "shaped");
+    let key;
+    for (let k in options.key) key[k] = assumeMinecraft(options.key[k]);
     this.file_contents = {
-      type: 'minecraft:crafting_shaped',
+      type: "minecraft:crafting_shaped",
       pattern: options.pattern,
       key,
       result: {
         item: options.result,
         count: options.count || 1,
       },
-    }
+    };
   }
-}
-export {
-  Recipe,
-  SmeltingRecipe,
-  StonecutterRecipe,
-  ShapelessCraftingRecipe,
-  ShapedCraftingRecipe,
 }
