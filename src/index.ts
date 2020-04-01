@@ -277,4 +277,4 @@ class Namespace {
     return copy
   }
 }
-export { Datapack, Namespace, Tag, recipes, loot, predicate, mcfunction }
+export default { Datapack, Namespace, Tag, recipes, loot, predicate, mcfunction }
