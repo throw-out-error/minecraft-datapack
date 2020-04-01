@@ -15,6 +15,7 @@ import { Recipe } from "./recipes";
 import * as loot from "./loot";
 import { LootTable } from "./loot";
 import * as predicate from "./predicate";
+import * as func from "./function";
 
 class Datapack {
   name: string;
@@ -248,4 +249,4 @@ class Namespace {
     return copy;
   }
 }
-export { Datapack, Namespace, Tag, recipes, loot, predicate };
+export { Datapack, Namespace, Tag, recipes, loot, predicate, func as function };
