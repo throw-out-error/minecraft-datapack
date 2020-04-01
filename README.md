@@ -120,3 +120,14 @@ datapack
 datapack.compile()
 //if you run /loot give @s dirt:dirt ingame you will get 1-64 dirt
 ```
+
+### Adding funcions
+
+```js
+//note: this feature is still WIP;
+const {function:{Command,Value}}=require("@throw-out-error/minecraft-datapack);
+//prints: say hello 69d
+console.log(
+  (new Command("say",["hello",new Value('double',69)])).compile()
+);
+```
