@@ -16,6 +16,7 @@ import * as loot from "./loot";
 import { LootTable } from "./loot";
 import * as predicate from "./predicate";
 import * as mcfunction from "./function";
+import { Function } from "./function"; 
 
 class Datapack {
   name: string;
@@ -105,11 +106,12 @@ class Datapack {
 
 class Namespace {
   name: string;
-  blockTags: object;
-  itemTags: object;
-  functionTags: object;
-  recipes: object;
-  lootTables: object;
+  blockTags: {[key:string]: Tag};
+  itemTags: {[key:string]:Tag};
+  functionTags: {[key:string]:Tag};
+  recipes: {[key:string]:Recipe};
+  lootTables: {[key:string]:LootTable};
+  functions: {[key:string]:Function};
   /**
    * Creates a namespace
    * @param {string} name The name of the namespace
@@ -135,6 +137,8 @@ class Namespace {
     this.recipes = {};
     /** @type {object} the dictionary of loot table files */
     this.lootTables = {};
+    /** @type {object} the dictionary of mcfunction files */
+    this.functions = {};
   }
   /**
    * Outputs the namespace's files
@@ -154,6 +158,8 @@ class Namespace {
       this.recipes[recipe].compile(`${namespacePath}/recipes`);
     for (let table in this.lootTables)
       this.lootTables[table].compile(`${namespacePath}/loot_tables`);
+    for (let funct in this.functions)
+      this.functions[funct].compile(`${namespacePath}/functions`);
   }
   /**
    * Add a tag to the namespace
@@ -237,6 +243,28 @@ class Namespace {
     let lootTable = new LootTable(path);
     this.addLootTable(lootTable);
     return lootTable;
+  }
+  /**
+   * Add a function to the namespace
+   * @param {Function} funct the function to be added
+   */
+  addFunction(funct:Function):Function{
+    if (Object.prototype.hasOwnProperty.call(this.functions, funct.path))
+      throw new Error(
+        `This name space already has the loot function ${funct.path}`
+      );
+    let copy = Function.copy(funct);
+    this.functions[funct.path] = copy;
+    return copy;
+  }
+  /**
+   * Creates a Function and adds it to the class
+   * @param {string} path the path of the mcfunction relative to namespace/functions (excluding file extension)
+   */
+  createFunction(path:string):Function{
+    let funct=new Function(path);
+    this.addFunction(funct);
+    return funct;
   }
   /**
    * Creates a copy of the namespace

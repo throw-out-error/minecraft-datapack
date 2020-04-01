@@ -14,6 +14,7 @@ Changed how the constructors of the classes work to make them imply a minecraft 
 console.log(new (require("@throw-out-error/minecraft-datapack").Tag)("_","item",["dirt","stone"]).values)
 //prints: ["minecraft:dirt","minecraft:stone"]
 ```
+Added a function class, and the ability to add mcfunctions to datapacks :O
 
 - Converted code to typescript
 

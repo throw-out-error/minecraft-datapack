@@ -125,9 +125,11 @@ datapack.compile()
 
 ```js
 //note: this feature is still WIP;
-const {function:{Command,Value}}=require("@throw-out-error/minecraft-datapack);
-//prints: say hello 69d
-console.log(
-  (new Command("say",["hello",new Value('double',69)])).compile()
-);
+const {Datapack,function:{Command,Function}}=require("@throw-out-error/minecraft-datapack);
+let datapack=new Datapack("Functions",__dirname,{description:"A cool datapack that adds a really mind blowing function, /function crazy_function:1"});
+let n=datapack.createNamespace("crazy_function");
+let funct=n.addFunction(new Function("1"));
+funct.addCommand(new Command("say",["hello"]));
+datapack.compile();
+//Execute the command /function crazy_function:1 to run the mind blowing function
 ```

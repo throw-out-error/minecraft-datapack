@@ -1,3 +1,39 @@
+import {getDirname,mkdirIfNotExist,fs} from "./utility";
+class Function {
+    commands:Command[];
+    path:string;
+    /**
+     * @param {string} path the path of the file relative to namspace/functions
+     */
+    constructor(path:string){
+        this.path=path;
+        this.commands=[];
+    }
+    compile(path:string){
+        let functionPath=`${path}/${this.path}.mcfunction`;
+        mkdirIfNotExist(getDirname(functionPath));
+        fs.writeFileSync(functionPath,this.commands.map(c=>c.compile()).join('\n'));
+    }
+    /**
+     * Add a command to the function
+     * @param {Command} command the command to be added
+     */
+    addCommand(command:Command){
+        this.commands.push(command);
+        return this;
+    }
+    /**
+     * Copies the function
+     * @param {Function} funct the function to be copied
+     * @returns {Function} a reference to the function
+     */
+    static copy(funct: Function): Function {
+        let copy = new Function("_");
+        for (let key in { ...funct }) copy[key] = funct[key];
+        return copy;
+    }
+}
+
 class Command {
     method:string;
     params:Array<Value|string>;
@@ -63,6 +99,7 @@ class ValueArray {
 } 
 
 export {
+    Function,
     Command,
     Value,
     ValueArray
