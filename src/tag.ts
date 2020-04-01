@@ -6,6 +6,10 @@ import {
   fs,
 } from "./utility";
 
+/**
+ * @class
+ * @alias module:tag
+ */
 class Tag {
   path: string;
   type: "block" | "item" | "function";
