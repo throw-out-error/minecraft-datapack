@@ -2,9 +2,10 @@
 # Change Log
 
 - 1.6 the ~~predicate update~~ __function update__:
-The class LootCondition has been renamed to Condition and is exported under the name "predicate.Condition". This is due to conditions being used in predicates as well as loot tables, the decision to move the condition class to the predicate namespace was due to predicates being able to be used as more complex conditions.
-Due to demand from our users(i.e. one person) we have decided to change this update to the function update :D
-Added Command class and Value class!
+The class LootCondition has been renamed to Condition and is exported under the name "predicate.Condition". This is due to conditions being used in predicates as well as loot tables, the decision to move the condition class to the predicate namespace was due to predicates being able to be used as more complex conditions.  
+Due to demand from our users(i.e. one person) we have decided to change this update to the function update :D  
+Added Command class and Value class!  
+Added ValueArray class!
 ```js 
 const {Command,Value}=require("@throw-out-error/minecraft-datapack").function;
 ```
