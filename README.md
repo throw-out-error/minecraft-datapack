@@ -121,15 +121,26 @@ datapack.compile()
 //if you run /loot give @s dirt:dirt ingame you will get 1-64 dirt
 ```
 
-### Adding funcions
+### Adding functions
 
 ```js
 //note: this feature is still WIP;
-const {Datapack,function:{Command,Function}}=require("@throw-out-error/minecraft-datapack);
-let datapack=new Datapack("Functions",__dirname,{description:"A cool datapack that adds a really mind blowing function, /function crazy_function:1"});
-let n=datapack.createNamespace("crazy_function");
-let funct=n.addFunction(new Function("1"));
-funct.addCommand(new Command("say",["hello"]));
-datapack.compile();
+const {
+  Datapack,
+  function: { Command, Function },
+} = require('@throw-out-error/minecraft-datapack')
+
+let datapack = new Datapack('Functions', __dirname, {
+  description:
+    'A cool datapack that adds a really mind blowing function, /function crazy_function:1',
+})
+
+let n = datapack.createNamespace('crazy_function')
+
+let funct = n.addFunction(new Function('1'))
+funct.addCommand(new Command('say', ['hello']))
+
+datapack.compile()
+
 //Execute the command /function crazy_function:1 to run the mind blowing function
 ```
