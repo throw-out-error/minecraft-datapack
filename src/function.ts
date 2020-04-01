@@ -45,7 +45,7 @@ export class Command {
   params: Array<Value | string>;
   /**
    * @param {string} method the command to be executed
-   * @param {Array<Value|string>} params the parameters to be passed to the command
+   * @param {Array<Value|string|Selector>} params the parameters to be passed to the command
    */
   constructor(method: string, params: Array<Value | string>) {
     this.method = method;

@@ -1,4 +1,4 @@
-import { hasIllegalCharsSlash, mkdirIfNotExist, jsonBeautify } from "./utility";
+import { hasIllegalCharsSlash, mkdirIfNotExist, jsonBeautify, assumeMinecraft } from "./utility";
 import fs from "fs";
 import { dirname } from "path";
 
@@ -210,7 +210,7 @@ export class ItemEntry extends LootEntry {
     super("minecraft:item");
     /** @typedef {object} */
     this.output = {
-      ...{ name: options.name, weight: options.weight },
+      ...{ name: assumeMinecraft(options.name), weight: options.weight },
     };
     /** @type {LootFunction[]} the entries array of functions */
     this.functions = [];

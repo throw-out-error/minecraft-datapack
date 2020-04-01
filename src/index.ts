@@ -37,7 +37,7 @@ export class Datapack {
   constructor(
     name: string,
     path: string,
-    options: { format?: number; description?: string }
+    options: { format?: number; description?: string } = {}
   ) {
     /** @type {string} the name of the datapack */
     this.name = name;
