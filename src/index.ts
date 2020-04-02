@@ -259,15 +259,6 @@ export class Namespace {
     return copy;
   }
   /**
-   * Creates a Function and adds it to the class
-   * @param {string} path the path of the mcfunction relative to namespace/functions (excluding file extension)
-   */
-  createFunction(path: string): McFunction {
-    let funct = new McFunction(path);
-    this.addFunction(funct);
-    return funct;
-  }
-  /**
    * Creates a copy of the namespace
    * @param {Namespace} namespace the namespace to be copied
    * @returns {Namespace} a copy of the namespace
