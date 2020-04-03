@@ -7,7 +7,7 @@ const dataCategories: string[] = [
   "tags/functions",
   "recipes",
   "loot_tables",
-  "predicates",
+  "predicates"
 ];
 
 import { Tag } from "./tag";
@@ -16,11 +16,11 @@ import { LootTable } from "./loot";
 import { McFunction } from "@throw-out-error/minecraft-mcfunction";
 
 // Exports
-export * as tag from "./tag";
-export * as recipes from "./recipes";
-export * as loot from "./loot";
-export * as mcfunction from "@throw-out-error/minecraft-mcfunction";
-export * as predicate from "./predicate";
+export * from "@throw-out-error/minecraft-mcfunction";
+export * from "./loot";
+export * from "./predicate";
+export * from "./recipes";
+export * from "./tag";
 
 export class Datapack {
   name: string;
@@ -151,10 +151,10 @@ export class Namespace {
   compile(path: string) {
     let namespacePath = `${path}/data/${this.name}`;
     mkdirIfNotExist(namespacePath);
-    dataCategories.forEach((category) => {
+    dataCategories.forEach(category => {
       mkdirIfNotExist(`${namespacePath}/${category}`);
     });
-    ["block", "item", "function"].forEach((type) => {
+    ["block", "item", "function"].forEach(type => {
       for (let tag in this[`${type}Tags`])
         this[`${type}Tags`][tag].compile(`${namespacePath}/tags`);
     });
