@@ -37,6 +37,6 @@
     "license": "MIT",
     "dependencies": {
         "@throw-out-error/minecraft-mcfunction": "^1.0.2",
-        "@types/node": "^13.9.8"
+        "@types/node": "^13.11.0"
     }
 }
