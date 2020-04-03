@@ -11,13 +11,16 @@ const dataCategories: string[] = [
 ];
 
 import { Tag } from "./tag";
-import * as recipes from "./recipes";
 import { Recipe } from "./recipes";
-import * as loot from "./loot";
 import { LootTable } from "./loot";
-import * as predicate from "./predicate";
-import * as mcfunction from "@throw-out-error/minecraft-mcfunction";
-import {McFunction} from "@throw-out-error/minecraft-mcfunction";
+import { McFunction } from "@throw-out-error/minecraft-mcfunction";
+
+// Exports
+export * as tag from "./tag";
+export * as recipes from "./recipes";
+export * as loot from "./loot";
+export * as mcfunction from "@throw-out-error/minecraft-mcfunction";
+export * as predicate from "./predicate";
 
 export class Datapack {
   name: string;
@@ -206,7 +209,7 @@ export class Namespace {
    * @returns {Recipe} a reference to the added recipe
    */
   addRecipe(recipe: Recipe): Recipe {
-    if (Object.prototype.hasOwnProperty.call(recipes, recipe.path))
+    if (Object.prototype.hasOwnProperty.call(this.recipes, recipe.path))
       throw new Error(
         `The recipe ${recipe.path} has already been added to this namespace`
       );
@@ -269,10 +272,3 @@ export class Namespace {
     return copy;
   }
 }
-export default {
-  Tag,
-  recipes,
-  loot,
-  predicate,
-  mcfunction,
-};
