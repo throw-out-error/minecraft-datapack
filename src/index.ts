@@ -206,7 +206,7 @@ export class Namespace {
    * @returns {Recipe} a reference to the added recipe
    */
   addRecipe(recipe: Recipe): Recipe {
-    if (Object.prototype.hasOwnProperty.call(recipes, recipe.path))
+    if (Object.prototype.hasOwnProperty.call(this.recipes, recipe.path))
       throw new Error(
         `The recipe ${recipe.path} has already been added to this namespace`
       );
