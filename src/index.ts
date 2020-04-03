@@ -11,13 +11,16 @@ const dataCategories: string[] = [
 ];
 
 import { Tag } from "./tag";
-import * as recipes from "./recipes";
 import { Recipe } from "./recipes";
-import * as loot from "./loot";
 import { LootTable } from "./loot";
-import * as predicate from "./predicate";
-import * as mcfunction from "@throw-out-error/minecraft-mcfunction";
-import {McFunction} from "@throw-out-error/minecraft-mcfunction";
+import { McFunction } from "@throw-out-error/minecraft-mcfunction";
+
+// Exports
+export * as tag from "./tag";
+export * as recipes from "./recipes";
+export * as loot from "./loot";
+export * as mcfunction from "@throw-out-error/minecraft-mcfunction";
+export * as predicate from "./predicate";
 
 export class Datapack {
   name: string;
@@ -269,10 +272,3 @@ export class Namespace {
     return copy;
   }
 }
-export default {
-  Tag,
-  recipes,
-  loot,
-  predicate,
-  mcfunction,
-};
