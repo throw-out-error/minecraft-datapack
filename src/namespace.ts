@@ -1,3 +1,4 @@
+import pth from "path";
 import { mkdirIfNotExist, hasIllegalChars } from "./utility";
 import { Tag } from "./tag";
 import { Recipe } from "./recipes";
@@ -52,24 +53,42 @@ export class Namespace {
   }
   /**
    * Outputs the namespace's files
-   * @param {string} path The root path where the namespace will compile
+   * @param {string} root The root path where the namespace will compile
    */
-  compile(path: string) {
-    let namespacePath = `${path}/data/${this.name}`;
+  async compile(root: string) {
+    const namespacePath = pth.join(root, "data", this.name);
+
     mkdirIfNotExist(namespacePath);
     dataCategories.forEach(category => {
-      mkdirIfNotExist(`${namespacePath}/${category}`);
+      mkdirIfNotExist(pth.join(namespacePath, category));
     });
+
+    const compiling: (Promise<any> | void)[] = [];
+
+    const tagsPath = pth.join(namespacePath, "tags");
     ["block", "item", "function"].forEach(type => {
-      for (let tag in this[`${type}Tags`])
-        this[`${type}Tags`][tag].compile(`${namespacePath}/tags`);
+      const tags = this[type + "Tags"];
+      for (let tag of Object.values<Tag>(tags)) {
+        compiling.push(tag.compile(tagsPath));
+      }
     });
-    for (let recipe in this.recipes)
-      this.recipes[recipe].compile(`${namespacePath}/recipes`);
-    for (let table in this.lootTables)
-      this.lootTables[table].compile(`${namespacePath}/loot_tables`);
-    for (let funct in this.functions)
-      this.functions[funct].compile(`${namespacePath}/functions`);
+
+    const recipePath = pth.join(namespacePath, "recipes");
+    for (let recipe of Object.values(this.recipes)) {
+      compiling.push(recipe.compile(recipePath));
+    }
+
+    const tablePath = pth.join(namespacePath, "loot_tables");
+    for (let table of Object.values(this.lootTables)) {
+      compiling.push(table.compile(tablePath));
+    }
+
+    const functionPath = pth.join(namespacePath, "functions");
+    for (let funct of Object.values(this.functions)) {
+      compiling.push(funct.compile(functionPath));
+    }
+
+    return Promise.all(compiling);
   }
   /**
    * Add a tag to the namespace
