@@ -1,4 +1,5 @@
-import fs from "fs";
+import fs, { promises as fsPromises } from "fs";
+import pth from "path";
 import { mkdirIfNotExist, hasIllegalChars } from "./utility";
 const dataCategories: string[] = [
   "functions",
@@ -60,21 +61,34 @@ export class Datapack {
     /** @type {object} the namespaces the datapack will use */
     this.namespaces = {};
   }
+
+  get mcmeta(){
+    return {
+      pack: {
+        pack_format: this.format,
+        description: this.description,
+      },
+    };
+  }
+
   /**
    * Output the files of the datapack
    */
-  compile() {
-    mkdirIfNotExist(`${this.path}/${this.name}/data`);
-    fs.writeFileSync(
-      `${this.path}/${this.name}/pack.mcmeta`,
-      `{\n\t"pack":{\n\t\t"pack_format":${
-        this.format
-      },\n\t\t"description":${JSON.stringify(this.description)}\n\t}\n}`
+  async compile(path:string) {
+    const root = pth.join(path, this.name);
+    mkdirIfNotExist(pth.join(root, "data"));
+    await fsPromises.writeFile(
+      pth.join(root, "pack.mcmeta"),
+      JSON.stringify(this.mcmeta, null, 2)
     );
-    this.minecraft.compile(`${this.path}/${this.name}`);
-    for (let namespace in this.namespaces)
-      this.namespaces[namespace].compile(`${this.path}/${this.name}`);
+
+    const namespaces: Namespace[] = [
+      this.minecraft,
+      ...Object.values(this.namespaces)
+    ];
+    await Promise.all(namespaces.map(ns => ns.compile(root)));
   }
+  
   /**
    * Add a namespace to the datapack, minecraft is added by default this.minecraft
    * @param {Namespace} namespace The namespace to be added
