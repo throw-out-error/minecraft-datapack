@@ -173,18 +173,20 @@ export class Namespace {
     this.addLootTable(lootTable);
     return lootTable;
   }
-  /**
-   * Add a function to the namespace
-   * @param {Function} funct the function to be added
-   */
-  addFunction(funct: McFunction): McFunction {
-    if (Object.prototype.hasOwnProperty.call(this.functions, funct.path))
-      throw new Error(
-        `This name space already has the loot function ${funct.path}`
-      );
-    let copy = McFunction.copy(funct);
-    this.functions[funct.path] = copy;
-    return copy;
+
+  addFunction(funct: McFunction): McFunction;
+  addFunction(source: () => void): McFunction;
+  addFunction(functOrSource: McFunction | (() => void)): McFunction {
+    if (typeof functOrSource === "function") {
+      functOrSource = new McFunction(functOrSource);
+    }
+
+    if (this.functions[functOrSource.name]) {
+      throw Error("Duplicate function name");
+    }
+    this.functions[functOrSource.name] = functOrSource;
+
+    return functOrSource;
   }
   /**
    * Creates a copy of the namespace
