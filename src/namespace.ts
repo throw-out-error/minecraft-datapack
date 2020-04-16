@@ -85,7 +85,18 @@ export class Namespace {
 
     const functionPath = pth.join(namespacePath, "functions");
     for (let funct of Object.values(this.functions)) {
-      compiling.push(funct.compile(functionPath));
+      compiling.push(
+        new Promise(async (res, rej) => {
+          try {
+            for await (let _ of funct.compile(functionPath)) {
+              void 0;
+            }
+            return res();
+          } catch (e) {
+            return rej(e);
+          }
+        })
+      );
     }
 
     return Promise.all(compiling);
