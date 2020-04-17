@@ -123,23 +123,35 @@ datapack.compile()
 
 ### Adding functions
 
+Create a datapack containing a mcfunction called `myfunction`, which kills every entity except players.
+
 ```js
-// note: this feature is still WIP;
+const { Datapack } = require("@throw-out-error/minecraft-datapack");
 const {
-  Datapack,
-  function: { Command, McFunction, Selector, SelectorTarget },
-} = require('@throw-out-error/minecraft-datapack')
+  McFunction,
+  Selector,
+  SelectorTarget,
+  kill
+} = require("@throw-out-error/minecraft-mcfunction");
 
-let datapack = new Datapack('Functions', __dirname, {
+const datapack = new Datapack("Functions", __dirname, {
   description:
-    'A cool datapack that adds a really mind blowing function, /function crazy_function:1',
-})
+    "A cool datapack that adds a really mind blowing function, /function crazy_function:1"
+});
 
-let n = datapack.createNamespace('crazy_function')
+const ns = datapack.createNamespace("crazy_function");
 
-let funct = n.addFunction(new McFunction('1',[new Command('kill', [new Selector(SelectorTarget.entity,{type:{player:false}})])]));
+ns.addFunction(
+  new McFunction(function myfunction() {
+    const notPlayer = new Selector(SelectorTarget.entity, {
+      type: {
+        player: false
+      }
+    });
 
-datapack.compile()
+    kill(notPlayer);
+  })
+);
 
-// Execute the command /function crazy_function:1 to run the mind blowing function
+datapack.compile(".");
 ```
