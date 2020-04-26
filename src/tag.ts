@@ -4,14 +4,19 @@ import {
   hasIllegalCharsSlash,
   mkdirIfNotExist,
   jsonBeautify,
-  assumeMinecraft,
+  assumeMinecraft
 } from "./utility";
+
+export interface TagObject {
+  replace?: boolean;
+  values: string[];
+}
 
 /**
  * @class
  * @alias module:tag
  */
-export class Tag {
+export class Tag implements TagObject {
   path: string;
   type: "block" | "item" | "function";
   values: string[];

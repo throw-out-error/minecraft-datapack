@@ -1,33 +1,119 @@
 import pth from "path";
+import { promises as fs, createWriteStream } from "fs";
 import { mkdirIfNotExist, hasIllegalChars } from "./utility";
-import { Tag } from "./tag";
+import { TagObject, Tag } from "./tag";
 import { Recipe } from "./recipes";
 import { LootTable } from "./loot";
 import { McFunction } from "@throw-out-error/minecraft-mcfunction";
+import stream, { Readable } from "stream";
+import { promisify } from "util";
+const pipeline = promisify(stream.pipeline);
 
-const dataCategories: string[] = [
+interface Tags {
+  blocks?: { [tag: string]: TagObject };
+  entityTypes?: { [tag: string]: TagObject };
+  fluid?: { [tag: string]: TagObject };
+  functions?: { [tag: string]: TagObject };
+  items?: { [tag: string]: TagObject };
+}
+type TagType = keyof Tags;
+const tagTypes: TagType[] = [
+  "blocks",
+  "entityTypes",
+  "fluid",
   "functions",
-  "tags/blocks",
-  "tags/items",
-  "tags/functions",
-  "recipes",
-  "loot_tables",
-  "predicates"
+  "items"
 ];
 
-export class Namespace {
-  name: string;
-  blockTags: { [key: string]: Tag };
-  itemTags: { [key: string]: Tag };
-  functionTags: { [key: string]: Tag };
-  recipes: { [key: string]: Recipe };
-  lootTables: { [key: string]: LootTable };
-  functions: { [key: string]: McFunction };
+async function waitForGenerator(gen: AsyncGenerator) {
+  while (!(await gen.next()).done) {}
+}
+
+export interface NamespaceObject<T extends string = string> {
+  name: T;
+  advancements?: {};
+  functions?: { [name: string]: McFunction };
+  lootTables?: { [name: string]: LootTable };
+  predicates?: {};
+  recipes?: { [name: string]: Recipe };
+  structures?: {};
+  tags?: Tags;
+}
+
+export async function compile(namespace: NamespaceObject, root: string) {
+  const namespacePath = pth.join(root, "data", namespace.name);
+  const compiling: any[] = [];
+
+  const allTags = namespace?.tags;
+  if (allTags) {
+    tagTypes.forEach(type => {
+      const tags = Object.entries<TagObject>(allTags?.[type] ?? {});
+      if (!tags.length) return;
+
+      const dir = pth.join(namespacePath, "tags", type);
+      mkdirIfNotExist(dir);
+
+      for (let [name, { replace, values }] of tags) {
+        let tagPath = pth.join(dir, name);
+        if (!pth.extname(tagPath)) tagPath += ".json";
+
+        const tag: TagObject = { values };
+        if (replace) tag.replace = true;
+
+        compiling.push(fs.writeFile(tagPath, JSON.stringify(tag)));
+      }
+    });
+  }
+
+  const recipes = Object.entries<Recipe>(namespace?.recipes ?? {});
+  if (recipes.length) {
+    const dir = pth.join(namespacePath, "recipes");
+    for (let [name, recipe] of recipes) {
+      name;
+      compiling.push(recipe.compile(dir));
+    }
+  }
+
+  const lootTables = Object.entries<LootTable>(namespace?.lootTables ?? {});
+  if (lootTables.length) {
+    const dir = pth.join(namespacePath, "loot_tables");
+    for (let [name, lootTable] of lootTables) {
+      name;
+      compiling.push(lootTable.compile(dir));
+    }
+  }
+
+  const functions = Object.values<McFunction>(namespace?.functions ?? {});
+  if (functions.length) {
+    const dir = pth.join(namespacePath, "functions");
+    mkdirIfNotExist(dir);
+    for (let fun of functions) {
+      const writeStream = createWriteStream(
+        pth.join(dir, `${fun.name}.mcfunction`)
+      );
+      const readStream = Readable.from(fun.compile());
+
+      compiling.push(pipeline(readStream, writeStream));
+    }
+  }
+
+  return Promise.all(compiling);
+}
+
+export class Namespace<T extends string = string> implements NamespaceObject {
+  name: T;
+  advancements?: {};
+  functions?: { [name: string]: McFunction };
+  lootTables?: { [name: string]: LootTable };
+  predicates?: {};
+  recipes?: { [name: string]: Recipe };
+  structures?: {};
+  tags?: Tags;
   /**
    * Creates a namespace
    * @param {string} name The name of the namespace
    */
-  constructor(name: string) {
+  constructor(name: T) {
     if (hasIllegalChars(name))
       throw new Error(
         "Namespace names can only contain the following characters 0-9, a-z, _, -, ."
@@ -38,106 +124,60 @@ export class Namespace {
       );
     /** @type {string} the name of the namespace */
     this.name = name;
-    /** @type {object} the dictionary of block tag files */
-    this.blockTags = {};
-    /** @type {object} the dictionary of item tag files */
-    this.itemTags = {};
-    /** @type {object} the dictionary of function tag files */
-    this.functionTags = {};
-    /** @type {object} the dictionary of recipe files */
-    this.recipes = {};
-    /** @type {object} the dictionary of loot table files */
-    this.lootTables = {};
-    /** @type {object} the dictionary of mcfunction files */
-    this.functions = {};
   }
   /**
    * Outputs the namespace's files
-   * @param {string} root The root path where the namespace will compile
+   * @param {string} root The root path of the datapack the namespace should compile into
    */
   async compile(root: string) {
-    const namespacePath = pth.join(root, "data", this.name);
-
-    mkdirIfNotExist(namespacePath);
-    dataCategories.forEach(category => {
-      mkdirIfNotExist(pth.join(namespacePath, category));
-    });
-
-    const compiling: (Promise<any> | void)[] = [];
-
-    const tagsPath = pth.join(namespacePath, "tags");
-    ["block", "item", "function"].forEach(type => {
-      const tags = this[type + "Tags"];
-      for (let tag of Object.values<Tag>(tags)) {
-        compiling.push(tag.compile(tagsPath));
-      }
-    });
-
-    const recipePath = pth.join(namespacePath, "recipes");
-    for (let recipe of Object.values(this.recipes)) {
-      compiling.push(recipe.compile(recipePath));
-    }
-
-    const tablePath = pth.join(namespacePath, "loot_tables");
-    for (let table of Object.values(this.lootTables)) {
-      compiling.push(table.compile(tablePath));
-    }
-
-    const functionPath = pth.join(namespacePath, "functions");
-    for (let funct of Object.values(this.functions)) {
-      compiling.push(
-        new Promise(async (res, rej) => {
-          try {
-            for await (let _ of funct.compile(functionPath)) {
-              void 0;
-            }
-            return res();
-          } catch (e) {
-            return rej(e);
-          }
-        })
-      );
-    }
-
-    return Promise.all(compiling);
+    return compile(this, root);
   }
+
   /**
    * Add a tag to the namespace
    * @param {Tag} tag The tag to be added
-   * @returns {Tag} a reference to the added tag
+   * @returns {TagObject} a reference to the added tag
    */
   addTag(tag: Tag): Tag {
-    if (Object.prototype.hasOwnProperty.call(this[`${tag.type}Tags`], tag.path))
+    const type = (tag.type + "s") as TagType;
+    if (this?.tags?.[type]?.[tag.path]) {
       throw new Error(
         `The tag ${tag.type}/${tag.path} has already been added to this namespace`
       );
-    let copy = Tag.copy(tag);
-    this[`${tag.type}Tags`][tag.path] = copy;
-    return copy;
+    }
+    let tags = this.tags;
+    if (!tags) tags = this.tags = {};
+    let tagType = tags[type];
+    if (!tagType) tagType = tags[type] = {};
+    tagType[tag.path] = tag;
+
+    return tag;
   }
   /**
    * Create a tag and add it to the namespace
    * @param {string} path The path of the tag file relative to namespace/tags/type (excluding the file extension)
-   * @param {('block'|'item'|'function')} type The type of tag
+   * @param {TagType} type The type of tag
    * @param {string[]} [values=[]]
-   * @returns {Tag} a reference to the created tag
+   * @returns {TagObject} a reference to the created tag
    */
-  createTag(
-    path: string,
-    type: "block" | "item" | "function",
-    values?: string[]
-  ): Tag {
-    let tag = new Tag(path, type, values || []);
-    this.addTag(tag);
+  createTag(path: string, type: TagType, values?: string[]): TagObject {
+    const tag = { values: values ?? [] };
+
+    let tags = this.tags;
+    if (!tags) tags = this.tags = {};
+    let tagType = tags[type];
+    if (!tagType) tagType = tags[type] = {};
+    tagType[path] = tag;
+
     return tag;
   }
   /**
    * Delete a tag
    * @param {string} path The path of the tag file relative to namespace/tags/type (excluding the file extension) to be deleted
-   * @param {('block'|'item'|'function')} type The type of tag to be deleted
+   * @param {TagType} type The type of tag to be deleted
    */
-  deleteTag(path, type) {
-    delete this[`${type}Tags`][path];
+  deleteTag(path: string, type: TagType) {
+    delete this.tags?.[type]?.[path];
   }
   /**
    * Add a recipe to the namespace
@@ -145,20 +185,23 @@ export class Namespace {
    * @returns {Recipe} a reference to the added recipe
    */
   addRecipe(recipe: Recipe): Recipe {
-    if (Object.prototype.hasOwnProperty.call(this.recipes, recipe.path))
+    if (this.recipes?.[recipe.path]) {
       throw new Error(
         `The recipe ${recipe.path} has already been added to this namespace`
       );
-    let copy = Recipe.copy(recipe);
-    this.recipes[recipe.path] = copy;
-    return copy;
+    }
+
+    let recipes = this.recipes;
+    if (!recipes) recipes = this.recipes = {};
+    recipes[recipe.path] = recipe;
+    return recipe;
   }
   /**
    * Delete a recipe
    * @param {string} path The path of the recipe file relative to namespace/recipes (excluding the file extension) to be deleted
    */
-  deleteRecipe(path) {
-    delete this.recipes[path];
+  deleteRecipe(path: string) {
+    delete this.recipes?.[path];
   }
   /**
    * Add a loot table to the namespace
@@ -166,13 +209,16 @@ export class Namespace {
    * @returns {LootTable} a reference to the added loot table
    */
   addLootTable(lootTable: LootTable): LootTable {
-    if (Object.prototype.hasOwnProperty.call(this.lootTables, lootTable.path))
+    if (this?.lootTables?.[lootTable.path]) {
       throw new Error(
         `This name space already has the loot table ${lootTable.path}`
       );
-    let copy = LootTable.copy(lootTable);
-    this.lootTables[lootTable.path] = copy;
-    return copy;
+    }
+
+    let lootTables = this.lootTables;
+    if (!lootTables) lootTables = this.lootTables = {};
+    lootTables[lootTable.path] = lootTable;
+    return lootTable;
   }
   /**
    * Create a loot table then add it to the namespace
@@ -192,10 +238,13 @@ export class Namespace {
       functOrSource = new McFunction(functOrSource);
     }
 
-    if (this.functions[functOrSource.name]) {
+    let functions = this.functions;
+    if (!functions) functions = this.functions = {};
+
+    if (functions[functOrSource.name]) {
       throw Error("Duplicate function name");
     }
-    this.functions[functOrSource.name] = functOrSource;
+    functions[functOrSource.name] = functOrSource;
 
     return functOrSource;
   }
@@ -203,6 +252,7 @@ export class Namespace {
    * Creates a copy of the namespace
    * @param {Namespace} namespace the namespace to be copied
    * @returns {Namespace} a copy of the namespace
+   * @deprecated Just why??
    */
   static copy(namespace: Namespace): Namespace {
     let copy = new Namespace("_");
