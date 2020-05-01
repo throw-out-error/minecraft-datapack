@@ -21,6 +21,8 @@ interface McMeta {
 
 export class Datapack {
   name: string;
+  format: Format;
+  description: string;
   minecraft: NamespaceObject<"minecraft">;
   namespaces: { [key: string]: NamespaceObject<typeof key> };
   meta: McMeta;
@@ -34,22 +36,26 @@ export class Datapack {
    */
   constructor(
     name: string,
-    options: { format?: Format; description?: string } = {}
+    { format, description }: { format?: Format; description?: string } = {}
   ) {
     /** @type {string} the name of the datapack */
     this.name = name;
-
-    this.meta = {
-      pack: {
-        pack_format: options.format ?? 5,
-        description: options.description ?? this.name
-      }
-    };
+    this.format = format ?? 5;
+    this.description = description ?? name;
 
     this.minecraft = { name: "minecraft" };
 
     /** @type {object} the namespaces the datapack will use */
     this.namespaces = {};
+  }
+
+  get meta(): McMeta {
+    return {
+      pack: {
+        pack_format: this.format,
+        description: this.description
+      }
+    };
   }
 
   /**
