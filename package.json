@@ -13,8 +13,8 @@
   ],
   "types": "dist/index.d.ts",
   "devDependencies": {
-    "typescript": "^3.8.3",
-    "@types/node": "^13.11.1"
+    "@types/node": "^13.13.5",
+    "typescript": "^3.8.3"
   },
   "repository": {
     "type": "git",
@@ -32,6 +32,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@throw-out-error/minecraft-mcfunction": "^1.1.4"
+    "@throw-out-error/minecraft-mcfunction": "^1.2.1"
   }
 }
