@@ -19,13 +19,12 @@ interface McMeta {
   };
 }
 
-export class Datapack {
+export class Datapack<T extends string> {
   name: string;
   format: Format;
   description: string;
   minecraft: NamespaceObject<"minecraft">;
-  namespaces: { [key: string]: NamespaceObject<typeof key> };
-  meta: McMeta;
+  namespaces: { [name in T]?: NamespaceObject<name> };
 
   /**
    * Creates a datapack
@@ -74,7 +73,7 @@ export class Datapack {
     );
 
     compiling.push(compileNS(this.minecraft, root));
-    for (let ns of Object.values<NamespaceObject>(this.namespaces)) {
+    for (let ns of Object.values(this.namespaces) as NamespaceObject<T>[]) {
       compiling.push(compileNS(ns, root));
     }
 
@@ -86,7 +85,7 @@ export class Datapack {
    * @param {NamespaceObject} namespace The namespace to be added
    * @returns {NamespaceObject} a reference to the added namespace
    */
-  addNamespace(namespace: NamespaceObject): NamespaceObject {
+  addNamespace(namespace: NamespaceObject<T>): NamespaceObject<T> {
     if (Object.prototype.hasOwnProperty.call(this.namespaces, namespace.name))
       throw new Error(
         `The namespace ${namespace.name} has already been added to this datapack`
@@ -99,7 +98,7 @@ export class Datapack {
    * @param {string} name The name of the namespace
    * @returns {Namespace} a reference to the created namespace
    */
-  createNamespace<T extends string = string>(name: T): Namespace<T> {
+  createNamespace(name: T): Namespace<T> {
     const namespace = new Namespace(name);
     this.addNamespace(namespace);
     return namespace;
@@ -108,7 +107,7 @@ export class Datapack {
    * Removes the namespace from the datapack
    * @param {string} name The name of the namespace
    */
-  deleteNamespace(name: string) {
+  deleteNamespace(name: T) {
     delete this.namespaces[name];
   }
 }
