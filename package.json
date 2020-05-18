@@ -25,17 +25,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/SebastianSpeitel/minecraft-datapack.git"
+    "url": "https://github.com/throw-out-error/minecraft-datapack.git"
   },
   "keywords": [
     "minecraft",
     "datapack"
   ],
-  "author": {
-    "name": "Sebastian Speitel"
-  },
   "contributors": [
-    "brenttrenholme"
+    "Brent Trenholme",
+    "Theo Paris",
+    "Sebastian Speitel"
   ],
   "license": "MIT",
   "dependencies": {
