@@ -10,19 +10,19 @@
 const {
   Command,
   Value,
-  ValueArray,
-} = require('@throw-out-error/minecraft-datapack').function
+  ValueArray
+} = require("@throw-out-error/minecraft-datapack").function;
 ```
 
 Changed how the constructors of the classes work to make them imply a minecraft namespace for certain parameters
 
 ```js
 console.log(
-  new (require('@throw-out-error/minecraft-datapack').Tag)('_', 'item', [
-    'dirt',
-    'stone',
+  new (require("@throw-out-error/minecraft-datapack").Tag)("_", "item", [
+    "dirt",
+    "stone"
   ]).values
-)
+);
 //prints: ["minecraft:dirt","minecraft:stone"]
 ```
 
@@ -30,8 +30,8 @@ Added a function class, and the ability to add mcfunctions to datapacks :O
 Added the Selector class for commands
 
 ```js
-new Selector('entity');
-new Selector('e');
+new Selector("entity");
+new Selector("e");
 ```
 
 - Converted code to typescript
