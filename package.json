@@ -38,6 +38,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@throw-out-error/minecraft-mcfunction": "^1.2.1"
+    "@throw-out-error/minecraft-mcfunction": "^1.2.4"
   }
 }
