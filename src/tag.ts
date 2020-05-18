@@ -4,7 +4,7 @@ import {
   hasIllegalCharsSlash,
   mkdirIfNotExist,
   jsonBeautify,
-  assumeMinecraft,
+  assumeMinecraft
 } from "./utility";
 
 /**
