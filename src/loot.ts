@@ -1,4 +1,9 @@
-import { hasIllegalCharsSlash, mkdirIfNotExist, jsonBeautify, assumeMinecraft } from "./utility";
+import {
+  hasIllegalCharsSlash,
+  mkdirIfNotExist,
+  jsonBeautify,
+  assumeMinecraft
+} from "./utility";
 import fs from "fs";
 import { dirname } from "path";
 
@@ -30,7 +35,7 @@ export class LootTable {
     mkdirIfNotExist(dirname(tablePath));
     fs.writeFileSync(
       tablePath,
-      jsonBeautify({ pools: this.pools.map((pool) => pool.compile()) })
+      jsonBeautify({ pools: this.pools.map(pool => pool.compile()) })
     );
   }
   /**
@@ -115,8 +120,8 @@ export class LootPool {
     return {
       rolls: this.rolls,
       bonus_rolls: this.bonusRolls,
-      entries: this.entries.map((entry) => entry.compile()),
-      conditions: this.conditions.map((condition) => condition.compile()),
+      entries: this.entries.map(entry => entry.compile()),
+      conditions: this.conditions.map(condition => condition.compile())
     };
   }
   /**
@@ -171,7 +176,7 @@ export class LootEntry {
   compile(): object {
     return {
       type: this.type,
-      conditions: this.conditions.map((condition) => condition.compile()),
+      conditions: this.conditions.map(condition => condition.compile())
     };
   }
   /**
@@ -210,7 +215,7 @@ export class ItemEntry extends LootEntry {
     super("minecraft:item");
     /** @typedef {object} */
     this.output = {
-      ...{ name: assumeMinecraft(options.name), weight: options.weight },
+      ...{ name: assumeMinecraft(options.name), weight: options.weight }
     };
     /** @type {LootFunction[]} the entries array of functions */
     this.functions = [];
@@ -240,7 +245,7 @@ export class ItemEntry extends LootEntry {
   compile(): object {
     return {
       ...this.output,
-      ...{ functions: this.functions.map((f) => f.compile()) },
+      ...{ functions: this.functions.map(f => f.compile()) }
     };
   }
 }
@@ -256,7 +261,7 @@ export class EmptyEntry extends LootEntry {
   constructor(options) {
     super("minecraft:empty");
     this.output = {
-      ...{ weight: options.weight || 1, quality: options.quality || 1 },
+      ...{ weight: options.weight || 1, quality: options.quality || 1 }
     };
   }
 }
@@ -273,7 +278,7 @@ export class LootTableEntry extends LootEntry {
   constructor(options) {
     super("minecraft:loot_table");
     this.output = {
-      ...{ weight: options.weight || 1, quality: options.quality || 1 },
+      ...{ weight: options.weight || 1, quality: options.quality || 1 }
     };
   }
 }
@@ -298,7 +303,9 @@ export class LootFunction {
   compile() {
     return {
       ...this.options,
-      ...{ condition: this.conditions.map((condition) => condition.compile()) },
+      ...{
+        condition: this.conditions.map(condition => condition.compile())
+      }
     };
   }
   /**

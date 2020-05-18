@@ -45,7 +45,7 @@ export function hasIllegalCharsSlash(s: string): boolean {
 export function itemArrayFromString(s: string): Array<any> {
   return s
     .split("||")
-    .map((s) => (s[0] == "#" ? { tag: s.slice(1) } : { item: s }));
+    .map(s => (s[0] == "#" ? { tag: s.slice(1) } : { item: s }));
 }
 
 export function assumeMinecraft(s: string): string {

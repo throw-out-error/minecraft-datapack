@@ -3,7 +3,7 @@ import {
   mkdirIfNotExist,
   jsonBeautify,
   itemArrayFromString,
-  assumeMinecraft,
+  assumeMinecraft
 } from "./utility";
 import fs from "fs";
 import { dirname as getDirname } from "path";
@@ -86,7 +86,7 @@ export class SmeltingRecipe extends Recipe {
       ),
       result: options.result,
       experience: options.experience,
-      cookingtime: options.cookingtime || 200,
+      cookingtime: options.cookingtime || 200
     };
   }
 }
@@ -112,7 +112,7 @@ export class StonecutterRecipe extends Recipe {
         options.ingredient.split("||").map(assumeMinecraft).join("||")
       ),
       result: options.result,
-      count: options.count || 1,
+      count: options.count || 1
     };
   }
 }
@@ -134,15 +134,15 @@ export class ShapelessCraftingRecipe extends Recipe {
     /** @type {string} The contents of the outputted file */
     this.file_contents = {
       type: "minecraft:crafting_shapeless",
-      ingredients: options.ingredients.map((ingredient) =>
+      ingredients: options.ingredients.map(ingredient =>
         itemArrayFromString(
           ingredient.split("||").map(assumeMinecraft).join("||")
         )
       ),
       result: {
         item: options.result,
-        count: options.count || 1,
-      },
+        count: options.count || 1
+      }
     };
   }
 }
@@ -159,7 +159,12 @@ export class ShapedCraftingRecipe extends Recipe {
    */
   constructor(
     path: string,
-    options: { pattern: string[]; key: object; result: string; count?: number }
+    options: {
+      pattern: string[];
+      key: object;
+      result: string;
+      count?: number;
+    }
   ) {
     super(path, "shaped");
     let key;
@@ -170,8 +175,8 @@ export class ShapedCraftingRecipe extends Recipe {
       key,
       result: {
         item: options.result,
-        count: options.count || 1,
-      },
+        count: options.count || 1
+      }
     };
   }
 }
