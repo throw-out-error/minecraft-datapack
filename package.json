@@ -4,8 +4,9 @@
   "description": "A module for making minecraft datapacks with node to cut down on the repetition.",
   "main": "dist/index.js",
   "scripts": {
-    "prepare": "npm run build --silent",
+    "prepare": "npm run lint --silent && npm run build --silent",
     "build": "tsc --build",
+    "lint": "eslint src/**/*.ts --quiet --fix",
     "test": "npm publish --dry-run"
   },
   "files": [
@@ -13,8 +14,14 @@
   ],
   "types": "dist/index.d.ts",
   "devDependencies": {
-    "@types/node": "^13.13.5",
-    "typescript": "^3.8.3"
+    "@types/node": "^14.0.1",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
+    "eslint": "^7.0.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "prettier": "^2.0.5",
+    "typescript": "^3.9.2"
   },
   "repository": {
     "type": "git",
